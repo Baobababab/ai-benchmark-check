@@ -116,7 +116,7 @@ def show_model(query, scores, models, benchmarks):
     """Print lab, price, release date and the rank in every benchmark for the models matching the query."""
     q = key(query)
     found = {}
-    for r in scores:
+    for r in sorted(scores, key=lambda r: r["benchmark"] != "eci"):  # ECI names are the cleanest
         if q in key(r["model"]):
             found.setdefault(key(r["model"]), r["model"])
     if not found or len(found) > 5:
