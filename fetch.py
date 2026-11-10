@@ -7,17 +7,15 @@ Sources (licenses in DATA_LICENSES.md):
   Epoch AI    correctness benchmarks       epoch.ai/data/benchmark_data.zip (Epoch's own runs only)
   models.dev  prices, open-weight flag     models.dev/api.json
 """
+
 import csv
 import io
 import json
-import statistics
 import sys
 import urllib.request
 import zipfile
 from datetime import date, datetime, timedelta
 from pathlib import Path
-
-import pyarrow.parquet as pq
 
 from recommend import key
 
@@ -38,6 +36,8 @@ def get(url):
 
 
 def arena():
+    import pyarrow.parquet as pq  # only needed here, so tests can import this file without it
+
     out = []
     for f in json.loads(get(ARENA))["parquet_files"]:
         if f["split"] != "latest" or f["config"] not in ARENA_CONFIGS:
@@ -48,8 +48,16 @@ def arena():
             for r in top:
                 lo, hi = r["rating_lower"], r["rating_upper"]
                 se = (hi - lo) / (2 * 1.96) if lo is not None and hi is not None else ""
-                out.append(dict(source="arena", benchmark=f"{f['config']}/{cat}", model=r["model_name"],
-                                score=r["rating"], se=se, date=str(r["leaderboard_publish_date"])[:10]))
+                out.append(
+                    {
+                        "source": "arena",
+                        "benchmark": f"{f['config']}/{cat}",
+                        "model": r["model_name"],
+                        "score": r["rating"],
+                        "se": se,
+                        "date": str(r["leaderboard_publish_date"])[:10],
+                    }
+                )
     return out
 
 
@@ -63,11 +71,21 @@ def epoch():
             continue
         latest = {}  # newest run per model
         for r in csv.DictReader(io.TextIOWrapper(z.open(m["source_file"]), encoding="utf-8")):
-            if r["mean_score"] and (r["Model version"] not in latest or r["Started at"] > latest[r["Model version"]]["Started at"]):
+            if r["mean_score"] and (
+                r["Model version"] not in latest or r["Started at"] > latest[r["Model version"]]["Started at"]
+            ):
                 latest[r["Model version"]] = r
         for r in latest.values():
-            out.append(dict(source="epoch", benchmark=m["source_file"].removesuffix(".csv"), model=r["Model version"],
-                            score=r["mean_score"], se=r["stderr"], date=r["Started at"][:10]))
+            out.append(
+                {
+                    "source": "epoch",
+                    "benchmark": m["source_file"].removesuffix(".csv"),
+                    "model": r["Model version"],
+                    "score": r["mean_score"],
+                    "se": r["stderr"],
+                    "date": r["Started at"][:10],
+                }
+            )
     return out
 
 
@@ -80,9 +98,10 @@ def prices():
                 by_key.setdefault(key(model_id), []).append((provider, c["input"], c["output"], m))
     out = []
     for k, offers in by_key.items():
-        offers.sort(key=lambda o: (o[1] + o[2], o[0]))  # equal prices: order by provider name, so every run picks the same offer
+        # Equal prices are ordered by provider name, so every run picks the same offer.
+        offers.sort(key=lambda o: (o[1] + o[2], o[0]))
         _, inp, outp, m = offers[len(offers) // 2]  # median offer: hosts of open models vary a lot
-        out.append(dict(key=k, input=inp, output=outp, open_weights=bool(m.get("open_weights"))))
+        out.append({"key": k, "input": inp, "output": outp, "open_weights": bool(m.get("open_weights"))})
     return out
 
 

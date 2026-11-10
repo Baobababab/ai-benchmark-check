@@ -5,6 +5,7 @@
 
 Scores come from data/scores.csv, prices from data/prices.csv (see README).
 """
+
 import argparse
 import csv
 import math
@@ -30,8 +31,7 @@ def key(name):
 def load():
     with open(DATA / "scores.csv", encoding="utf-8", newline="") as f:
         scores = [
-            {**r, "score": float(r["score"]), "se": float(r["se"]) if r["se"] else None}
-            for r in csv.DictReader(f)
+            {**r, "score": float(r["score"]), "se": float(r["se"]) if r["se"] else None} for r in csv.DictReader(f)
         ]
     with open(DATA / "prices.csv", encoding="utf-8", newline="") as f:
         prices = {r["key"]: r for r in csv.DictReader(f)}
@@ -54,10 +54,7 @@ def pick(rows, prices, open_only=False):
     if not pool:
         return None, None, [], []
     best = max(pool, key=lambda r: r["score"])
-    tied = [
-        r for r in pool
-        if best["score"] - r["score"] <= Z * math.hypot(best["se"] or 0, r["se"] or 0)
-    ]
+    tied = [r for r in pool if best["score"] - r["score"] <= Z * math.hypot(best["se"] or 0, r["se"] or 0)]
     priced = sorted((r for r in tied if r["price"] is not None), key=lambda r: (r["price"], -r["score"]))
     unpriced = [r for r in tied if r["price"] is None]
     return best, (priced[0] if priced else None), priced, unpriced
@@ -125,7 +122,9 @@ def main(argv=None):
     if unpriced:
         print("Tied but no price found (not considered): " + ", ".join(r["model"] for r in unpriced[:8]))
     print("Tied = scores within 95% confidence of the best.")
-    print("Price = median listed price on models.dev, 3:1 input:output blend. Per token only: reasoning modes use more tokens.")
+    print(
+        "Price = median listed price on models.dev, 3:1 input:output blend. Per token only: reasoning modes use more tokens."
+    )
     return 0
 
 

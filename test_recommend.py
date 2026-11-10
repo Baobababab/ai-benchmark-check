@@ -1,18 +1,29 @@
 """Offline checks for the recommendation logic. Run: python -m unittest"""
+
 import unittest
 
+from fetch import check
 from recommend import key, pick
 
 PRICES = {  # key -> price row, as read from data/prices.csv
-    "bigmodel": {"input": "10", "output": "30", "open_weights": "False"},       # blended $15
-    "midmodel": {"input": "1", "output": "3", "open_weights": "False"},         # blended $1.5
-    "openmodel": {"input": "0.2", "output": "0.6", "open_weights": "True"},     # blended $0.3
-    "weakmodel": {"input": "0.1", "output": "0.1", "open_weights": "True"},     # cheap but clearly worse
+    "bigmodel": {"input": "10", "output": "30", "open_weights": "False"},  # blended $15
+    "midmodel": {"input": "1", "output": "3", "open_weights": "False"},  # blended $1.5
+    "openmodel": {"input": "0.2", "output": "0.6", "open_weights": "True"},  # blended $0.3
+    "weakmodel": {"input": "0.1", "output": "0.1", "open_weights": "True"},  # cheap but clearly worse
 }
 
 
 def row(model, score, se):
     return {"model": model, "score": score, "se": se}
+
+
+ROWS = [
+    row("BigModel", 1500, 5),  # best
+    row("MidModel (High)", 1495, 5),  # within noise of the best, 10x cheaper
+    row("OpenModel", 1493, 5),  # within noise, cheapest tied model
+    row("WeakModel", 1400, 5),  # cheaper still, but clearly worse: not tied
+    row("MysteryModel", 1499, 5),  # tied but no price
+]
 
 
 class KeyTest(unittest.TestCase):
@@ -26,29 +37,30 @@ class KeyTest(unittest.TestCase):
 
 
 class PickTest(unittest.TestCase):
-    rows = [
-        row("BigModel", 1500, 5),     # best
-        row("MidModel (High)", 1495, 5),  # within noise of the best, 10x cheaper
-        row("OpenModel", 1493, 5),    # within noise, cheapest tied model
-        row("WeakModel", 1400, 5),    # cheaper still, but clearly worse: not tied
-        row("MysteryModel", 1499, 5),  # tied but no price
-    ]
-
     def test_recommends_cheapest_tied_model(self):
-        best, rec, priced, unpriced = pick(self.rows, PRICES)
+        best, rec, priced, unpriced = pick(ROWS, PRICES)
         self.assertEqual(best["model"], "BigModel")
         self.assertEqual(rec["model"], "OpenModel")
         self.assertEqual([r["model"] for r in priced], ["OpenModel", "MidModel (High)", "BigModel"])
         self.assertEqual([r["model"] for r in unpriced], ["MysteryModel"])
 
     def test_open_only_ignores_closed_models(self):
-        best, rec, _, _ = pick(self.rows, PRICES, open_only=True)
+        best, rec, _, _ = pick(ROWS, PRICES, open_only=True)
         self.assertEqual((best["model"], rec["model"]), ("OpenModel", "OpenModel"))
 
     def test_no_uncertainty_means_only_exact_ties(self):
         rows = [row("BigModel", 90, None), row("MidModel", 89, None)]
         _, rec, _, _ = pick(rows, PRICES)
         self.assertEqual(rec["model"], "BigModel")
+
+
+class CheckTest(unittest.TestCase):
+    """fetch.check() must stop the update instead of letting broken data through."""
+
+    def test_empty_source_is_rejected(self):
+        scores = [{"source": "arena", "benchmark": "x", "model": "m", "score": 1, "se": 1, "date": "2026-11-09"}]
+        with self.assertRaises(SystemExit):
+            check(scores, [])
 
 
 if __name__ == "__main__":

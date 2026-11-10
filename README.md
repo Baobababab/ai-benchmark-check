@@ -1,5 +1,7 @@
 # AI Benchmark Check
 
+[![CI](https://github.com/Baobababab/ai-benchmark-check/actions/workflows/ci.yml/badge.svg)](https://github.com/Baobababab/ai-benchmark-check/actions/workflows/ci.yml)
+
 Tells you which AI model to use for a task: the **cheapest model that is statistically as good as the best one**, based on open leaderboards and public prices.
 
 **Status:** small personal project. Tested on Python 3.12, on Windows and on Linux (GitHub Actions).
@@ -21,22 +23,30 @@ This is a snapshot from 10 November 2026. The data changes every day.
 
 ## Quickstart
 
-You need Python 3.9 or newer and Git. No API key, no account.
+You need Python 3.12 or newer. No API key, no account.
+
+1. Get the code: `git clone https://github.com/Baobababab/ai-benchmark-check.git`
+   (no Git? On the GitHub page use **Code → Download ZIP** and unzip it).
+2. Open a terminal in the folder: `cd ai-benchmark-check`
+3. Ask a question:
 
 ```bash
-git clone https://github.com/Baobababab/ai-benchmark-check.git
-cd ai-benchmark-check
 python recommend.py --list              # what you can ask about
 python recommend.py gpqa_diamond        # recommend a model for science questions
 python recommend.py coding --open       # open-weight models only
 ```
 
-`recommend.py` only reads the CSV files in `data/`, so nothing else needs installing.
+`recommend.py` only reads the CSV files in `data/` and uses the Python standard library, so nothing needs installing.
 The benchmark name can be a part of the full name (`coding` finds `text_style_control/coding`).
+On some systems the command is `python3` instead of `python`.
 
-To refresh the data yourself (it also updates daily on GitHub):
+### Refresh the data yourself (optional)
+
+The data also updates every day on GitHub. To download it yourself, create an isolated environment first:
 
 ```bash
+python -m venv .venv
+source .venv/bin/activate               # Windows PowerShell: .venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 python fetch.py
 ```
@@ -62,7 +72,7 @@ A GitHub Actions job runs `fetch.py` every day and commits the new data. If a so
 python -m unittest
 ```
 
-Five offline tests check the name matching and the tie rule. `fetch.py` has its own sanity checks (row counts, data age, price coverage) that run on every update.
+Six offline tests check the name matching, the tie rule and that a broken data source stops the update. On every push, GitHub Actions also runs the tests and the [Ruff](https://docs.astral.sh/ruff/) style checks (the CI badge above). `fetch.py` has its own sanity checks (row counts, data age, price coverage) that run on every update.
 
 ## Limitations and safety
 
@@ -70,6 +80,7 @@ Five offline tests check the name matching and the tie rule. `fetch.py` has its 
 - **Not covered:** agentic coding (SWE-bench style), speed, image and video generation prices, long-context accuracy. I found no data for these that I may legally redistribute.
 - **Prices are rough.** Per token only, the median across providers, assuming 3 input tokens per output token. Reasoning modes (High, Max) use more tokens, so real costs can be higher.
 - **Tied is not equal.** New models have few votes and a wide uncertainty, so they can look tied with the best. The `+/-` shows how sure a score is.
+- **The tie test is simple.** It treats each score as independent. Scores of different models are measured on the same questions or battles, so a paired test could separate some pairs that this one calls tied.
 - **Name matching is a heuristic.** Models without a matching price show as "price unknown" and are never recommended.
 - **Only the top 100 models** of each benchmark are kept.
 - It does not replace testing a model on your own task. No credentials are used or stored.
