@@ -4,8 +4,9 @@
 
 Sources (licenses in DATA_LICENSES.md):
   LMArena     human preference scores      HuggingFace lmarena-ai/leaderboard-dataset
-  Epoch AI    correctness benchmarks       epoch.ai/data/benchmark_data.zip (Epoch's own runs only)
-  models.dev  prices, open-weight flag     models.dev/api.json
+  Epoch AI    correctness benchmarks, the Epoch Capabilities Index (ECI), lab and availability of each model
+              epoch.ai/data/benchmark_data.zip (Epoch's own runs only)
+  models.dev  prices, open-weight flag, release date     models.dev/api.json
 """
 
 import csv
@@ -17,7 +18,7 @@ import zipfile
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
-from recommend import key
+from recommend import key, snapshot
 
 DATA = Path(__file__).parent / "data"
 UA = {"User-Agent": "ai-benchmark-check (https://github.com/Baobababab/ai-benchmark-check)"}
@@ -28,6 +29,7 @@ ARENA_CONFIGS = {"text_style_control", "vision_style_control", "webdev", "search
 TOP = 100  # keep the best 100 models per benchmark: enough to find ties, keeps the files small
 MAX_AGE = timedelta(days=60)  # newest score older than this means the source stopped updating
 SCORE_FIELDS = ["source", "benchmark", "model", "score", "se", "date"]
+MODEL_FIELDS = ["key", "input", "output", "open_weights", "released", "lab", "access"]
 
 
 def get(url):
@@ -61,17 +63,17 @@ def arena():
     return out
 
 
-def epoch():
-    z = zipfile.ZipFile(io.BytesIO(get(EPOCH)))
+def epoch(z):
     out = []
     meta = csv.DictReader(io.TextIOWrapper(z.open("benchmark_metadata.csv"), encoding="utf-8"))
     for m in meta:
         # Only Epoch's own runs are CC BY. Files ending in _external keep their original license.
         if not m["source_file"] or m["source_file"].endswith("_external.csv") or m["superseded_by"]:
             continue
+        col = m["score_column"] or "mean_score"  # the column Epoch itself reports for this benchmark
         latest = {}  # newest run per model
         for r in csv.DictReader(io.TextIOWrapper(z.open(m["source_file"]), encoding="utf-8")):
-            if r["mean_score"] and (
+            if r[col] and (
                 r["Model version"] not in latest or r["Started at"] > latest[r["Model version"]]["Started at"]
             ):
                 latest[r["Model version"]] = r
@@ -81,12 +83,35 @@ def epoch():
                     "source": "epoch",
                     "benchmark": m["source_file"].removesuffix(".csv"),
                     "model": r["Model version"],
-                    "score": r["mean_score"],
+                    "score": r[col],
                     "se": r["stderr"],
                     "date": r["Started at"][:10],
                 }
             )
+    # The Epoch Capabilities Index combines many benchmarks into one number per model.
+    for r in csv.DictReader(io.TextIOWrapper(z.open("epoch_capabilities_index/eci_scores.csv"), encoding="utf-8")):
+        if r["eci"]:
+            lo, hi = r["eci_ci_low"], r["eci_ci_high"]
+            out.append(
+                {
+                    "source": "epoch",
+                    "benchmark": "eci",
+                    "model": r["Display name"],
+                    "score": r["eci"],
+                    "se": (float(hi) - float(lo)) / (2 * 1.96) if lo and hi else "",  # assumes a symmetric interval
+                    "date": r["date"][:10],
+                }
+            )
     return out
+
+
+def epoch_meta(z):
+    """Lab and availability ('API access', 'Limited access', 'Unreleased'...) of every Epoch model, by key."""
+    meta = {}
+    for r in csv.DictReader(io.TextIOWrapper(z.open("model_metadata.csv"), encoding="utf-8")):
+        lab = r["organization"].split(",")[0]  # some models list several labs: keep the first
+        meta.setdefault(key(r["model_group"]), (lab, r["accessibility"]))
+    return meta
 
 
 def prices():
@@ -101,7 +126,31 @@ def prices():
         # Equal prices are ordered by provider name, so every run picks the same offer.
         offers.sort(key=lambda o: (o[1] + o[2], o[0]))
         _, inp, outp, m = offers[len(offers) // 2]  # median offer: hosts of open models vary a lot
-        out.append({"key": k, "input": inp, "output": outp, "open_weights": bool(m.get("open_weights"))})
+        released = min((o[3]["release_date"] for o in offers if o[3].get("release_date")), default="")
+        out.append(
+            {"key": k, "input": inp, "output": outp, "open_weights": bool(m.get("open_weights")), "released": released}
+        )
+    return out
+
+
+def models(price_rows, scores, meta):
+    """One row per model: price, open-weight flag and release date (models.dev), lab and availability (Epoch)."""
+    priced = {r["key"]: r for r in price_rows}
+    out = []
+    for k in priced.keys() | {key(r["model"]) for r in scores}:
+        p = priced.get(k, {})
+        lab, access = meta.get(k, ("", ""))
+        out.append(
+            {
+                "key": k,
+                "input": p.get("input", ""),
+                "output": p.get("output", ""),
+                "open_weights": p.get("open_weights", ""),
+                "released": p.get("released", ""),
+                "lab": lab,
+                "access": access,
+            }
+        )
     return out
 
 
@@ -133,18 +182,23 @@ def check(scores, price_rows):
     if len(price_rows) < 500:
         sys.exit(f"ERROR: models.dev returned only {len(price_rows)} priced models.")
     priced = {r["key"] for r in price_rows}
-    top = [r["model"] for r in scores if r["benchmark"] == "text_style_control/overall"][:20]
-    found = sum(key(m) in priced for m in top)
-    if found < 14:
-        sys.exit(f"ERROR: only {found}/20 top Arena models have a price. Name matching may be broken.")
+    for benchmark in ("text_style_control/overall", "eci"):
+        rows = sorted((r for r in scores if r["benchmark"] == benchmark), key=lambda r: -float(r["score"]))
+        if len(rows) < 50:
+            sys.exit(f"ERROR: {benchmark} has only {len(rows)} rows (expected >= 50).")
+        found = sum(key(r["model"]) in priced for r in rows[:20])
+        if found < 14:
+            sys.exit(f"ERROR: only {found}/20 top {benchmark} models have a price. Name matching may be broken.")
 
 
 if __name__ == "__main__":
-    scores = drop_stale(arena() + epoch())
+    z = zipfile.ZipFile(io.BytesIO(get(EPOCH)))
+    scores = drop_stale(arena() + epoch(z))
     price_rows = prices()
     check(scores, price_rows)
     DATA.mkdir(exist_ok=True)
     write("scores.csv", SCORE_FIELDS, scores)
-    write("prices.csv", ["key", "input", "output", "open_weights"], price_rows)
+    write("models.csv", MODEL_FIELDS, models(price_rows, scores, epoch_meta(z)))
     (DATA / "last_update.txt").write_text(date.today().isoformat() + "\n")
+    (DATA / "SNAPSHOT.md").write_text(snapshot(date.today()), encoding="utf-8", newline="\n")
     print(f"OK: {len(scores)} scores, {len(price_rows)} priced models")
