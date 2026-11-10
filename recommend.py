@@ -20,7 +20,7 @@ from pathlib import Path
 
 DATA = Path(__file__).parent / "data"
 Z = 1.96  # 95% confidence: two scores closer than Z standard errors are "tied"
-CEILING = 0.95  # ponytail: fixed cut-off, a correctness score above it separates models poorly
+CEILING = 0.95  # a correctness score above this separates models poorly, so we warn
 RISKY = {"Unreleased", "Limited access"}  # availability labels from Epoch worth a warning
 KEY_BENCHMARKS = [  # shown in the snapshot, besides the Epoch Capabilities Index
     ("text_style_control/overall", "Writing and chat (human preference)"),
@@ -44,7 +44,9 @@ def key(name):
     'Claude Fable 5.2 (Max)', 'claude-fable-5-2_max' and 'claude-fable-5-2' -> 'claudefable52'.
     """
     n = re.sub(r"\s*\(.*?\)", "", name.lower().split("/")[-1])  # drop '(High)' style tags
-    n = re.sub(r"_(minimal|none|low|medium|high|xhigh|max|promax|unknown)$", "", n.strip())  # drop '_max' effort tags
+    n = re.sub(
+        r"_(minimal|none|low|medium|high|xhigh|max|promax|unknown|\d+k)$", "", n.strip()
+    )  # drop '_max' effort tags
     n = re.sub(r"-(\d{8}|\d{4}-\d{2}-\d{2})$", "", n)  # drop date stamps
     return re.sub(r"[^a-z0-9]", "", n)
 
@@ -76,6 +78,7 @@ def prepare(rows, models, open_only=False):
             "open": m.get("open_weights") == "True",
             "lab": m.get("lab", ""),
             "access": m.get("access", ""),
+            "name": m.get("name", ""),
         }
         if k not in best or r["score"] > best[k]["score"]:
             best[k] = r
@@ -104,36 +107,55 @@ def score_text(r, source, name):
         text, scale, digits = f"{r['score']:.1f} ECI", 1, 1
     else:
         text, scale, digits = f"{100 * r['score']:.1f}%", 100, 1
-    return text if r["se"] is None else f"{text} +/-{scale * Z * r['se']:.{digits}f}"
+    return f"{text} +/-{scale * Z * r['se']:.{digits}f}" if r["se"] else text  # no +/- when there is no uncertainty
+
+
+def label(r):
+    """Name to print. Epoch run ids like 'gemini-4-argon_high' become 'Gemini 4 Argon (high)' when the name is known."""
+    if r["source"] != "epoch" or not r["name"]:
+        return r["model"]
+    setting = re.search(r"_(minimal|none|low|medium|high|xhigh|max|promax)$", r["model"])
+    return f"{r['name']} ({setting.group(1)})" if setting else r["name"]
 
 
 def show(r, source, name):
     price = "price unknown" if r["price"] is None else f"${r['price']:.2f}/M tokens"
-    return f"{r['model']}  {score_text(r, source, name)}  {price}"
+    tag = f"  [Epoch: {r['access']}]" if r["access"] in RISKY else ""
+    return f"{label(r)}  {score_text(r, source, name)}  {price}{tag}"
 
 
 def show_model(query, scores, models, benchmarks):
-    """Print lab, price, release date and the rank in every benchmark for the models matching the query."""
+    """Print lab, price, release date and the rank in the key benchmarks for the models matching the query."""
     q = key(query)
     found = {}
     for r in sorted(scores, key=lambda r: r["benchmark"] != "eci"):  # ECI names are the cleanest
         if q in key(r["model"]):
             found.setdefault(key(r["model"]), r["model"])
+    if q in found:  # an exact name wins over longer names that contain it (o3 and o3-mini)
+        found = {q: found[q]}
     if not found or len(found) > 5:
-        print("No model matches." if not found else "Too many models match. Candidates:")
+        print("No model matches." if not found else "Too many models match. Candidates:", file=sys.stderr)
         for name in sorted(found.values())[:20]:
-            print(f"  {name}")
+            print(f"  {name}", file=sys.stderr)
         return 1
+    source = {bench: src for src, bench in benchmarks}
+    shown = [b for b in ["eci"] + [b for b, _ in KEY_BENCHMARKS] if b in source]
     for k, name in found.items():
         m = models.get(k, {})
         price = f"${blended(m):.2f}/M tokens" if m.get("input") else "price unknown"
         note = f", Epoch: {m['access']}" if m.get("access") else ""
         print(f"{name}: lab {m.get('lab') or 'unknown'}, released {m.get('released') or 'unknown'}, {price}{note}")
-        for source, bench in sorted(benchmarks):
-            ranking = sorted(prepare([r for r in scores if r["benchmark"] == bench], models), key=lambda r: -r["score"])
-            for i, r in enumerate(ranking, 1):
+        others = len({r["benchmark"] for r in scores if key(r["model"]) == k and r["benchmark"] not in shown})
+        for bench in shown:
+            ranking = prepare([r for r in scores if r["benchmark"] == bench], models)
+            for r in ranking:
                 if key(r["model"]) == k:
-                    print(f"  {bench}  {score_text(r, source, bench)}  #{i} of {len(ranking)}  ({r['model']})")
+                    rank = 1 + sum(x["score"] > r["score"] for x in ranking)  # equal scores share a rank
+                    print(
+                        f"  {bench}  {score_text(r, source[bench], bench)}  #{rank} of {len(ranking)}  ({r['model']})"
+                    )
+        if others:
+            print(f"  ... and {others} other benchmarks: python recommend.py <benchmark> --top 100")
     return 0
 
 
@@ -157,7 +179,7 @@ def snapshot(today):
         for i, r in enumerate(ranked(name)[:n], 1):
             price = "n/a" if r["price"] is None else f"{r['price']:.2f}"
             note = f"Epoch: {r['access']}" if r["access"] in RISKY else ""
-            cells = [i, r["model"], score_text(r, source[name], name), r["lab"] or "-", price, note]
+            cells = [i, label(r), score_text(r, source[name], name), r["lab"] or "-", price, note]
             rows.append("| " + " | ".join(str(c).replace("|", "/") for c in cells) + " |")
         return rows
 
@@ -194,6 +216,8 @@ def snapshot(today):
     out += [
         "## Newest models (released in the last 60 days, date from models.dev)",
         "",
+        f"{len(recent)} models qualify" + (", the 20 newest are shown." if len(recent) > 20 else "."),
+        "",
         "| Released | Model | Lab | Price $/M | On LMArena | In ECI | Note |",
         "|---|---|---|---|---|---|---|",
     ]
@@ -216,11 +240,13 @@ def snapshot(today):
         if r["lab"] and r["lab"] not in seen and len(seen) < 12:
             seen.add(r["lab"])
             price = "n/a" if r["price"] is None else f"{r['price']:.2f}"
-            out.append(f"| {r['lab']} | {r['model']} | {score_text(r, 'epoch', 'eci')} | {price} |")
+            out.append(f"| {r['lab']} | {label(r)} | {score_text(r, 'epoch', 'eci')} | {price} |")
 
     out += ["", "## Key benchmarks, top 5 each"]
-    for name, label in KEY_BENCHMARKS:
-        out += ["", f"### {label}: `{name}`", ""]
+    for name, title in KEY_BENCHMARKS:
+        if name not in by:  # a renamed or dropped benchmark must not break the update
+            continue
+        out += ["", f"### {title}: `{name}`", ""]
         top = ranked(name)[0]["score"]
         if source[name] == "epoch" and top >= CEILING:
             out += ["Near the ceiling: the top models are hard to tell apart on this benchmark.", ""]
@@ -240,20 +266,26 @@ def main(argv=None):
     ap.add_argument("--top", type=int, metavar="N", help="show the N best models instead of a recommendation")
     ap.add_argument("--model", metavar="NAME", help="show everything known about one model")
     args = ap.parse_args(argv)
+    if args.top is not None and args.top < 1:
+        ap.error("--top must be 1 or more")
+    if (args.list is not None) + bool(args.model) + bool(args.benchmark) > 1:
+        ap.error("use only one of: a benchmark name, --model, --list")
+    if (args.open or args.top is not None) and not args.benchmark:
+        ap.error("--open and --top need a benchmark name")
 
     scores, models = load()
     benchmarks = {}
     for r in scores:
-        b = benchmarks.setdefault((r["source"], r["benchmark"]), {"n": 0, "date": ""})
-        b["n"] += 1
+        b = benchmarks.setdefault((r["source"], r["benchmark"]), {"keys": set(), "date": ""})
+        b["keys"].add(key(r["model"]))
         b["date"] = max(b["date"], r["date"])
 
     if args.list is not None:
         found = [(k, b) for k, b in sorted(benchmarks.items()) if args.list.lower() in k[1].lower()]
         for (src, name), b in found:
-            print(f"{name}  [{src}, {b['n']} models, newest score {b['date']}]")
+            print(f"{name}  [{src}, {len(b['keys'])} models, newest score {b['date']}]")
         if not found:
-            print("No benchmark matches.")
+            print("No benchmark matches.", file=sys.stderr)
         return 0 if found else 1
     if args.model:
         return show_model(args.model, scores, models, benchmarks)
@@ -264,9 +296,11 @@ def main(argv=None):
         k for k in benchmarks if args.benchmark.lower() in k[1].lower()
     ]
     if len(names) != 1:
-        print("No single benchmark matches. Candidates:" if names else "Unknown benchmark. Try --list.")
+        print(
+            "No single benchmark matches. Candidates:" if names else "Unknown benchmark. Try --list.", file=sys.stderr
+        )
         for src, name in names:
-            print(f"  {name}")
+            print(f"  {name}", file=sys.stderr)
         return 1
     source, name = names[0]
     rows = [r for r in scores if r["benchmark"] == name]
@@ -276,13 +310,12 @@ def main(argv=None):
     if args.top:
         print(header)
         for i, r in enumerate(sorted(prepare(rows, models, args.open), key=lambda r: -r["score"])[: args.top], 1):
-            note = f"  [Epoch: {r['access']}]" if r["access"] in RISKY else ""
-            print(f"{i:>3}. {show(r, source, name)}  {r['lab'] or '-'}{note}")
+            print(f"{i:>3}. {show(r, source, name)}  {r['lab'] or '-'}")
         return 0
 
     best, rec, priced, unpriced = pick(rows, models, args.open)
     if best is None:
-        print("No open-weight model with a known price in this benchmark.")
+        print("No open-weight model in this benchmark.", file=sys.stderr)
         return 1
     print(header)
     print(f"{'Best (open only):' if args.open else 'Best:':<18}{show(best, source, name)}")
@@ -298,9 +331,6 @@ def main(argv=None):
         print(f"Note: {len(same)} models share the top score, so 'Best' is the cheapest of them.")
     if source == "epoch" and name != "eci" and best["score"] >= CEILING:
         print("Warning: the top score is 95% or more, near the ceiling. Models are hard to tell apart here.")
-    for r in {id(r): r for r in (best, rec) if r}.values():
-        if r["access"] in RISKY:
-            print(f"Note: Epoch lists {r['model']} as '{r['access']}'. Check that you can use it.")
     others = [r for r in priced if r is not rec and r is not best]
     if others:
         print("Also tied with the best, cheapest first:")
@@ -310,11 +340,10 @@ def main(argv=None):
             print(f"  ... and {len(others) - 7} more")
     if unpriced:
         more = f" ... and {len(unpriced) - 8} more" if len(unpriced) > 8 else ""
-        print("Tied but no price found (not considered): " + ", ".join(r["model"] for r in unpriced[:8]) + more)
-    print("Tied = scores within 95% confidence of the best.")
-    print(
-        "Price = median listed price on models.dev, 3:1 input:output blend. Per token only: reasoning modes use more tokens."
-    )
+        print("Tied but no price found (not considered): " + ", ".join(label(r) for r in unpriced[:8]) + more)
+    print("Tied = scores within 95% confidence of the best. [Epoch: ...] = availability according to Epoch.")
+    print("Price = median listed price on models.dev, 3:1 input:output blend. Per token only.")
+    print("Reasoning modes (High, Max) use more tokens, so real costs can be higher.")
     return 0
 
 

@@ -7,7 +7,7 @@ import zipfile
 from datetime import date
 
 from fetch import check, epoch, epoch_meta, models
-from recommend import key, main, pick, snapshot
+from recommend import Z, blended, key, label, load, main, pick, score_text, show, snapshot
 
 PRICES = {  # key -> model row, as read from data/models.csv
     "bigmodel": {"input": "10", "output": "30", "open_weights": "False"},  # blended $15
@@ -39,6 +39,9 @@ class KeyTest(unittest.TestCase):
         self.assertEqual(key("gpt-5.4-2026-03-05_xhigh"), key("gpt-5.4"))
         self.assertNotEqual(key("Qwen 3.8 Max"), key("Qwen 3.8"))  # 'Max' in a name is not an effort tag
 
+    def test_size_suffix(self):
+        self.assertEqual(key("claude-opus-4-6_32K"), key("claude-opus-4-6"))
+
     def test_epoch_effort_tags_none_and_promax(self):
         self.assertEqual(key("gpt-6-astra_none"), key("GPT-6 Astra (Max)"))
         self.assertEqual(key("gpt-6-astra_promax"), key("GPT-6 Astra (Max)"))
@@ -60,6 +63,16 @@ class PickTest(unittest.TestCase):
         rows = [row("BigModel", 90, None), row("MidModel", 89, None)]
         _, rec, _, _ = pick(rows, PRICES)
         self.assertEqual(rec["model"], "BigModel")
+
+    def test_price_is_three_input_tokens_per_output_token(self):
+        self.assertEqual(blended(PRICES["bigmodel"]), 15)  # (3 * 10 + 30) / 4
+        self.assertEqual(pick(ROWS, PRICES)[0]["price"], 15)
+
+    def test_tie_limit_is_z_times_the_combined_uncertainty(self):
+        limit = Z * (5**2 + 5**2) ** 0.5
+        for gap, tied in ((limit - 0.5, True), (limit + 0.5, False)):
+            rows = [row("BigModel", 1500, 5), row("OpenModel", 1500 - gap, 5)]
+            self.assertEqual(len(pick(rows, PRICES)[2]) == 2, tied)
 
     def test_one_row_per_model(self):
         rows = [row("MidModel (High)", 1490, 5), row("MidModel (Low)", 1480, 5), row("MidModel", 1485, 5)]
@@ -99,6 +112,25 @@ def fake_epoch_zip():
     return zipfile.ZipFile(io.BytesIO(buf.getvalue()))
 
 
+class ShowTest(unittest.TestCase):
+    def test_scores_are_formatted_per_source(self):
+        r = {"score": 0.964, "se": 0.0117, "source": "epoch", "model": "m", "name": ""}
+        self.assertEqual(score_text(r, "epoch", "gpqa"), "96.4% +/-2.3")
+        self.assertEqual(score_text({**r, "score": 1526.4, "se": 5}, "arena", "x"), "1526 Elo +/-10")
+        self.assertEqual(score_text({**r, "score": 174.2, "se": 2}, "epoch", "eci"), "174.2 ECI +/-3.9")
+        self.assertEqual(score_text({**r, "se": 0}, "epoch", "gpqa"), "96.4%")  # no false precision
+
+    def test_unreleased_models_are_tagged(self):
+        r = {"model": "m", "score": 1, "se": 1, "price": 2.0, "access": "Unreleased", "source": "arena", "name": ""}
+        self.assertIn("[Epoch: Unreleased]", show(r, "arena", "x"))
+        self.assertNotIn("[Epoch", show({**r, "access": "API access"}, "arena", "x"))
+
+    def test_epoch_run_id_gets_a_readable_name(self):
+        r = {"model": "gemini-4-argon_high", "name": "Gemini 4 Argon", "source": "epoch"}
+        self.assertEqual(label(r), "Gemini 4 Argon (high)")
+        self.assertEqual(label({**r, "source": "arena", "model": "Gemini 4 Argon (High)"}), "Gemini 4 Argon (High)")
+
+
 class ParserTest(unittest.TestCase):
     def test_epoch_zip(self):
         out = epoch(fake_epoch_zip())
@@ -116,9 +148,21 @@ class ModelsTest(unittest.TestCase):
     def test_lab_from_lmarena_written_like_epoch(self):
         meta = {"known": ("Meta AI", "API access")}
         orgs = {"known": "meta", "newone": "meta", "stranger": "some-lab", "nolab": ""}
-        scores = [{"model": n} for n in ("Known", "NewOne (Max)", "Stranger", "NoLab")]
+        scores = [
+            {"source": "arena", "benchmark": "x", "model": n} for n in ("Known", "NewOne (Max)", "Stranger", "NoLab")
+        ]
         labs = {r["key"]: r["lab"] for r in models([], scores, meta, orgs)}
         self.assertEqual(labs, {"known": "Meta AI", "newone": "Meta AI", "stranger": "Some Lab", "nolab": ""})
+
+    def test_open_weights_from_epoch_and_proper_names(self):
+        meta = {"opened": ("Lab", "Open weights (unrestricted)"), "closed": ("Lab", "API access")}
+        scores = [
+            {"source": "epoch", "benchmark": "gpqa", "model": "opened_high"},
+            {"source": "arena", "benchmark": "x", "model": "Closed (High)"},
+        ]
+        rows = {r["key"]: r for r in models([], scores, meta, {})}
+        self.assertEqual((rows["opened"]["open_weights"], rows["closed"]["open_weights"]), ("True", ""))
+        self.assertEqual((rows["opened"]["name"], rows["closed"]["name"]), ("", "Closed (High)"))  # raw run id: no name
 
 
 class CheckTest(unittest.TestCase):
@@ -148,11 +192,25 @@ class OutputTest(unittest.TestCase):
         self.assertEqual(len([line for line in text.splitlines() if " ECI " in line]), 3)
 
     def test_one_model_and_unknown_inputs(self):
-        code, text = self.run_main("--model", "gpt-6.1-sol")
+        scores, _ = load()
+        top = max((r for r in scores if r["benchmark"] == "eci"), key=lambda r: r["score"])["model"]
+        code, text = self.run_main("--model", top)
         self.assertEqual(code, 0)
         self.assertIn("  eci  ", text)
-        self.assertEqual(self.run_main("--model", "no-such-model-xyz")[0], 1)
-        self.assertEqual(self.run_main("--list", "no-such-benchmark-xyz")[0], 1)
+        self.assertLess(len(text.splitlines()), 40)  # the key benchmarks only, not every benchmark
+        with contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(self.run_main("--model", "no-such-model-xyz")[0], 1)
+            self.assertEqual(self.run_main("--list", "no-such-benchmark-xyz")[0], 1)
+
+    def test_bad_flags_are_rejected(self):
+        for args in (
+            ["eci", "--top", "0"],
+            ["eci", "--top", "-1"],
+            ["--list", "eci", "--top", "2"],
+            ["--model", "x", "eci"],
+        ):
+            with self.subTest(args=args), contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+                main(args)
 
     def test_snapshot_has_every_section(self):
         text = snapshot(date(2026, 11, 10))

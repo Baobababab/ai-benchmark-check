@@ -12,6 +12,7 @@ Sources (licenses in DATA_LICENSES.md):
 import csv
 import io
 import json
+import re
 import sys
 import urllib.request
 import zipfile
@@ -19,7 +20,7 @@ from collections import Counter
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
-from recommend import key, snapshot
+from recommend import Z, key, snapshot
 
 DATA = Path(__file__).parent / "data"
 UA = {"User-Agent": "ai-benchmark-check (https://github.com/Baobababab/ai-benchmark-check)"}
@@ -30,7 +31,7 @@ ARENA_CONFIGS = {"text_style_control", "vision_style_control", "webdev", "search
 TOP = 100  # keep the best 100 models per benchmark: enough to find ties, keeps the files small
 MAX_AGE = timedelta(days=60)  # newest score older than this means the source stopped updating
 SCORE_FIELDS = ["source", "benchmark", "model", "score", "se", "date"]
-MODEL_FIELDS = ["key", "input", "output", "open_weights", "released", "lab", "access"]
+MODEL_FIELDS = ["key", "input", "output", "open_weights", "released", "lab", "access", "name"]
 
 
 def get(url):
@@ -52,7 +53,7 @@ def arena():
             for r in top:
                 orgs[key(r["model_name"])] = r["organization"]
                 lo, hi = r["rating_lower"], r["rating_upper"]
-                se = (hi - lo) / (2 * 1.96) if lo is not None and hi is not None else ""
+                se = (hi - lo) / (2 * Z) if lo is not None and hi is not None else ""
                 out.append(
                     {
                         "source": "arena",
@@ -101,7 +102,7 @@ def epoch(z):
                     "benchmark": "eci",
                     "model": r["Display name"],
                     "score": r["eci"],
-                    "se": (float(hi) - float(lo)) / (2 * 1.96) if lo and hi else "",  # assumes a symmetric interval
+                    "se": (float(hi) - float(lo)) / (2 * Z) if lo and hi else "",  # assumes a symmetric 95% interval
                     "date": r["date"][:10],
                 }
             )
@@ -129,7 +130,8 @@ def prices():
         # Equal prices are ordered by provider name, so every run picks the same offer.
         offers.sort(key=lambda o: (o[1] + o[2], o[0]))
         _, inp, outp, m = offers[len(offers) // 2]  # median offer: hosts of open models vary a lot
-        released = min((o[3]["release_date"] for o in offers if o[3].get("release_date")), default="")
+        dates = (o[3].get("release_date") or "" for o in offers)
+        released = min((d for d in dates if re.fullmatch(r"\d{4}-\d{2}-\d{2}", d) and d >= "2015"), default="")
         out.append(
             {"key": k, "input": inp, "output": outp, "open_weights": bool(m.get("open_weights")), "released": released}
         )
@@ -145,21 +147,27 @@ def models(price_rows, scores, meta, orgs):
     spelling = {}  # LMArena slug -> Epoch's name for the lab, from the models both sources know
     for (slug, lab), _ in Counter((orgs[k], meta[k][0]) for k in orgs if k in meta and orgs[k]).most_common():
         spelling.setdefault(slug, lab)
+    display = {}  # proper name of a model: from ECI or LMArena, never a raw Epoch run id
+    for r in sorted(scores, key=lambda r: r["benchmark"] != "eci"):
+        if r["source"] == "arena" or r["benchmark"] == "eci":
+            display.setdefault(key(r["model"]), r["model"])
     out = []
     for k in priced.keys() | {key(r["model"]) for r in scores}:
         p = priced.get(k, {})
         lab, access = meta.get(k, ("", ""))
         slug = orgs.get(k, "")
         lab = lab or (spelling.get(slug) or slug.replace("-", " ").title())
+        open_weights = "True" if access.startswith("Open weights") else p.get("open_weights", "")  # Epoch knows too
         out.append(
             {
                 "key": k,
                 "input": p.get("input", ""),
                 "output": p.get("output", ""),
-                "open_weights": p.get("open_weights", ""),
+                "open_weights": open_weights,
                 "released": p.get("released", ""),
                 "lab": lab,
                 "access": access,
+                "name": display.get(k, ""),
             }
         )
     return out
@@ -211,6 +219,6 @@ if __name__ == "__main__":
     DATA.mkdir(exist_ok=True)
     write("scores.csv", SCORE_FIELDS, scores)
     write("models.csv", MODEL_FIELDS, models(price_rows, scores, epoch_meta(z), orgs))
-    (DATA / "last_update.txt").write_text(date.today().isoformat() + "\n")
+    (DATA / "last_update.txt").write_text(date.today().isoformat() + "\n", newline="\n")
     (DATA / "SNAPSHOT.md").write_text(snapshot(date.today()), encoding="utf-8", newline="\n")
     print(f"OK: {len(scores)} scores, {len(price_rows)} priced models")

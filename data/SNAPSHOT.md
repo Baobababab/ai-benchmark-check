@@ -31,6 +31,8 @@ How to read it:
 
 ## Newest models (released in the last 60 days, date from models.dev)
 
+24 models qualify, the 20 newest are shown.
+
 | Released | Model | Lab | Price $/M | On LMArena | In ECI | Note |
 |---|---|---|---|---|---|---|
 | 2026-11-10 | Gemini 4 Carbon (High) | Google DeepMind | 4.00 | yes | no | Epoch: Unreleased |
@@ -159,11 +161,11 @@ Near the ceiling: the top models are hard to tell apart on this benchmark.
 
 | # | Model | Score | Lab | Price $/M | Note |
 |---|---|---|---|---|---|
-| 1 | gemini-4-argon_high | 96.4% +/-2.3 | Google DeepMind | 4.00 | Epoch: Limited access |
-| 2 | gpt-6-astra_max | 95.8% +/-2.7 | OpenAI | 20.00 |  |
-| 3 | claude-sonnet-5-5_max | 95.6% +/-2.7 | Anthropic | 4.00 |  |
-| 4 | gemini-3.8-flash_high | 95.4% +/-2.7 | Google DeepMind | 1.50 |  |
-| 5 | gpt-6.1-sol_max | 95.4% +/-2.7 | OpenAI | 4.00 |  |
+| 1 | Gemini 4 Argon (high) | 96.4% +/-2.3 | Google DeepMind | 4.00 | Epoch: Limited access |
+| 2 | GPT-6 Astra (max) | 95.8% +/-2.7 | OpenAI | 20.00 |  |
+| 3 | Claude Sonnet 5.5 (max) | 95.6% +/-2.7 | Anthropic | 4.00 |  |
+| 4 | Gemini 3.8 Flash (high) | 95.4% +/-2.7 | Google DeepMind | 1.50 |  |
+| 5 | GPT-6.1 Sol (max) | 95.4% +/-2.7 | OpenAI | 4.00 |  |
 
 ### Maths (correctness): `frontiermath_tiers_1_3_v2`
 
@@ -171,11 +173,11 @@ Near the ceiling: the top models are hard to tell apart on this benchmark.
 
 | # | Model | Score | Lab | Price $/M | Note |
 |---|---|---|---|---|---|
-| 1 | claude-fable-5-2_max | 95.1% +/-2.5 | Anthropic | 16.00 |  |
-| 2 | gpt-6-astra_max | 93.7% +/-2.8 | OpenAI | 20.00 |  |
-| 3 | gpt-6.1-sol_max | 93.7% +/-2.8 | OpenAI | 4.00 |  |
-| 4 | claude-opus-5-5_max | 91.2% +/-3.3 | Anthropic | 8.00 |  |
-| 5 | gpt-6.1-terra_max | 90.9% +/-3.3 | OpenAI | 2.00 |  |
+| 1 | Claude Fable 5.2 (max) | 95.1% +/-2.5 | Anthropic | 16.00 |  |
+| 2 | GPT-6 Astra (max) | 93.7% +/-2.8 | OpenAI | 20.00 |  |
+| 3 | GPT-6.1 Sol (max) | 93.7% +/-2.8 | OpenAI | 4.00 |  |
+| 4 | Claude Opus 5.5 (max) | 91.2% +/-3.3 | Anthropic | 8.00 |  |
+| 5 | GPT-6.1 Terra (max) | 90.9% +/-3.3 | OpenAI | 2.00 |  |
 
 ### Competition maths (correctness): `otis_mock_aime_2024_2025`
 
@@ -183,21 +185,21 @@ Near the ceiling: the top models are hard to tell apart on this benchmark.
 
 | # | Model | Score | Lab | Price $/M | Note |
 |---|---|---|---|---|---|
-| 1 | claude-fable-5-1_max | 100.0% +/-0.0 | Anthropic | 20.00 |  |
-| 2 | claude-fable-5_high | 100.0% +/-0.0 | Anthropic | 20.00 |  |
-| 3 | claude-opus-5-5_max | 100.0% +/-0.0 | Anthropic | 8.00 |  |
-| 4 | claude-sonnet-5-5_max | 100.0% +/-0.0 | Anthropic | 4.00 |  |
-| 5 | gemini-4-argon_high | 100.0% +/-0.0 | Google DeepMind | 4.00 | Epoch: Limited access |
+| 1 | Claude Fable 5.1 (max) | 100.0% | Anthropic | 20.00 |  |
+| 2 | Claude Fable 5 (high) | 100.0% | Anthropic | 20.00 |  |
+| 3 | Claude Opus 5.5 (max) | 100.0% | Anthropic | 8.00 |  |
+| 4 | Claude Sonnet 5.5 (max) | 100.0% | Anthropic | 4.00 |  |
+| 5 | Gemini 4 Argon (high) | 100.0% | Google DeepMind | 4.00 | Epoch: Limited access |
 
 ### Factual accuracy (correctness): `simpleqa_verified`
 
 | # | Model | Score | Lab | Price $/M | Note |
 |---|---|---|---|---|---|
-| 1 | claude-fable-5-2_max | 94.0% +/-1.5 | Anthropic | 16.00 |  |
-| 2 | gemini-4-argon_high | 76.0% +/-2.6 | Google DeepMind | 4.00 | Epoch: Limited access |
-| 3 | gpt-6-astra_max | 75.6% +/-2.7 | OpenAI | 20.00 |  |
-| 4 | gpt-6.1-sol_max | 73.9% +/-2.7 | OpenAI | 4.00 |  |
-| 5 | gemini-3.1-pro-preview_high | 73.5% +/-2.7 | Google DeepMind | 4.50 |  |
+| 1 | Claude Fable 5.2 (max) | 94.0% +/-1.5 | Anthropic | 16.00 |  |
+| 2 | Gemini 4 Argon (high) | 76.0% +/-2.6 | Google DeepMind | 4.00 | Epoch: Limited access |
+| 3 | GPT-6 Astra (max) | 75.6% +/-2.7 | OpenAI | 20.00 |  |
+| 4 | GPT-6.1 Sol (max) | 73.9% +/-2.7 | OpenAI | 4.00 |  |
+| 5 | Gemini 3.1 Pro Preview (high) | 73.5% +/-2.7 | Google DeepMind | 4.50 |  |
 
 ## All benchmarks (ask `python recommend.py <name> --top 20` for any of them)
 
