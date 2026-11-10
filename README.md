@@ -46,6 +46,7 @@ python recommend.py --list              # what you can ask about
 python recommend.py gpqa_diamond        # cheapest model tied with the best on science questions
 python recommend.py coding --open       # open-weight models only
 python recommend.py eci --top 10        # the 10 strongest models overall
+python recommend.py --model gpt-6.1-sol # one model: lab, price, release date, rank in every benchmark
 ```
 
 `recommend.py` only reads the files in `data/` and uses the Python standard library, so nothing needs installing.
@@ -87,7 +88,7 @@ A GitHub Actions job runs `fetch.py` every day and commits the new data. If a so
 python -m unittest
 ```
 
-Fourteen tests run offline. They check the name matching, the tie rule, the Epoch parser on a small fake data file, that a broken data source stops the update, and that the committed data produces answers. On every push, GitHub Actions also runs the tests and the [Ruff](https://docs.astral.sh/ruff/) style checks (the CI badge above). `fetch.py` has its own sanity checks (row counts, data age, price coverage) that run on every update.
+Fifteen tests run offline. They check the name matching, the tie rule, the Epoch parser on a small fake data file, that a broken data source stops the update, and that the committed data produces answers. On every push, GitHub Actions also runs the tests and the [Ruff](https://docs.astral.sh/ruff/) style checks (the CI badge above). `fetch.py` has its own sanity checks (row counts, data age, price coverage) that run on every update.
 
 ## Limitations and safety
 

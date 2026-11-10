@@ -3,6 +3,7 @@
     python recommend.py --list [filter]            list benchmarks you can ask about
     python recommend.py <benchmark> [--open]       recommend a model for that benchmark
     python recommend.py <benchmark> --top N        show the N best models of that benchmark
+    python recommend.py --model <name>             one model: lab, price, release date, rank in every benchmark
 
 Scores come from data/scores.csv, prices and model facts from data/models.csv (see README).
 data/SNAPSHOT.md is a ready-made overview of the same data, written by fetch.py.
@@ -111,6 +112,31 @@ def show(r, source, name):
     return f"{r['model']}  {score_text(r, source, name)}  {price}"
 
 
+def show_model(query, scores, models, benchmarks):
+    """Print lab, price, release date and the rank in every benchmark for the models matching the query."""
+    q = key(query)
+    found = {}
+    for r in scores:
+        if q in key(r["model"]):
+            found.setdefault(key(r["model"]), r["model"])
+    if not found or len(found) > 5:
+        print("No model matches." if not found else "Too many models match. Candidates:")
+        for name in sorted(found.values())[:20]:
+            print(f"  {name}")
+        return 1
+    for k, name in found.items():
+        m = models.get(k, {})
+        price = f"${blended(m):.2f}/M tokens" if m.get("input") else "price unknown"
+        note = f", Epoch: {m['access']}" if m.get("access") else ""
+        print(f"{name}: lab {m.get('lab') or 'unknown'}, released {m.get('released') or 'unknown'}, {price}{note}")
+        for source, bench in sorted(benchmarks):
+            ranking = sorted(prepare([r for r in scores if r["benchmark"] == bench], models), key=lambda r: -r["score"])
+            for i, r in enumerate(ranking, 1):
+                if key(r["model"]) == k:
+                    print(f"  {bench}  {score_text(r, source, bench)}  #{i} of {len(ranking)}  ({r['model']})")
+    return 0
+
+
 def snapshot(today):
     """Markdown overview of the whole dataset, so a reader (or an AI agent) gets the full picture at once."""
     scores, models = load()
@@ -211,6 +237,7 @@ def main(argv=None):
     ap.add_argument("--list", nargs="?", const="", metavar="FILTER", help="list benchmarks")
     ap.add_argument("--open", action="store_true", help="only open-weight models")
     ap.add_argument("--top", type=int, metavar="N", help="show the N best models instead of a recommendation")
+    ap.add_argument("--model", metavar="NAME", help="show everything known about one model")
     args = ap.parse_args(argv)
 
     scores, models = load()
@@ -221,12 +248,16 @@ def main(argv=None):
         b["date"] = max(b["date"], r["date"])
 
     if args.list is not None:
-        for (src, name), b in sorted(benchmarks.items()):
-            if args.list.lower() in name.lower():
-                print(f"{name}  [{src}, {b['n']} models, newest score {b['date']}]")
-        return 0
+        found = [(k, b) for k, b in sorted(benchmarks.items()) if args.list.lower() in k[1].lower()]
+        for (src, name), b in found:
+            print(f"{name}  [{src}, {b['n']} models, newest score {b['date']}]")
+        if not found:
+            print("No benchmark matches.")
+        return 0 if found else 1
+    if args.model:
+        return show_model(args.model, scores, models, benchmarks)
     if not args.benchmark:
-        ap.error("give a benchmark name or use --list")
+        ap.error("give a benchmark name, --model or --list")
 
     names = [k for k in benchmarks if k[1] == args.benchmark] or [
         k for k in benchmarks if args.benchmark.lower() in k[1].lower()

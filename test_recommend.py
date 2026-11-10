@@ -138,6 +138,13 @@ class OutputTest(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(len([line for line in text.splitlines() if " ECI " in line]), 3)
 
+    def test_one_model_and_unknown_inputs(self):
+        code, text = self.run_main("--model", "gpt-6.1-sol")
+        self.assertEqual(code, 0)
+        self.assertIn("  eci  ", text)
+        self.assertEqual(self.run_main("--model", "no-such-model-xyz")[0], 1)
+        self.assertEqual(self.run_main("--list", "no-such-benchmark-xyz")[0], 1)
+
     def test_snapshot_has_every_section(self):
         text = snapshot(date(2026, 11, 10))
         for heading in ("Strongest models overall", "Newest models", "Best model of each lab", "Key benchmarks"):
