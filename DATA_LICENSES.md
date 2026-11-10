@@ -18,7 +18,13 @@ derived from the three sources below and keep **their** licenses. Terms were rea
 - License: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), for Epoch's own evaluation runs.
   Files ending in `_external.csv` come from other projects, keep their original licenses and are **not** used here.
 - Citation: Epoch AI, 'Capabilities & benchmarking'. Published online at epoch.ai. Retrieved from 'https://epoch.ai/benchmarks' [online resource].
-- Changes made here: latest run per model, selected columns, benchmarks marked as superseded are skipped.
+- Also used from the same download: the Epoch Capabilities Index (`epoch_capabilities_index/eci_scores.csv`)
+  and the lab and availability of each model (`model_metadata.csv`). The ECI is computed by Epoch from many
+  benchmarks, some of them from external projects. Epoch distributes it in the same download under the same
+  CC BY 4.0 grant and without an external-license marker, so it is treated as Epoch's own data. This reading was
+  made on 10 November 2026; if Epoch states otherwise, remove the `eci` rows from `fetch.py`.
+- Changes made here: latest run per model, selected columns, the score column named by Epoch's own metadata,
+  benchmarks marked as superseded are skipped, standard error of the ECI computed from its published interval.
 
 ## models.dev: prices and open-weight flag
 
@@ -49,7 +55,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-- Changes made here: one price per model (the median listed price across providers, free plans ignored), selected columns.
+- Changes made here: one price per model (the median listed price across providers, free plans ignored), the
+  earliest release date listed by any provider, selected columns.
 
 ## Sources considered and not used
 

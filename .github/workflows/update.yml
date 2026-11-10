@@ -6,11 +6,15 @@ on:
   workflow_dispatch: # manual run from the Actions tab
 
 permissions:
-  contents: write # needed to commit the refreshed CSV files
+  contents: read
+
+concurrency: update-data # never two updates at the same time
 
 jobs:
   update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # needed to commit the refreshed data files
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
@@ -22,6 +26,9 @@ jobs:
       # fetch.py exits with an error if a source is empty, stale or no longer matches prices.
       # A red run means the data was NOT updated.
       - run: python fetch.py
+      # The new data must still produce answers before it is committed.
+      - run: python recommend.py eci --top 3
+      - run: python -m unittest
       - name: Commit the data if it changed
         run: |
           git config user.name "github-actions[bot]"
