@@ -173,7 +173,8 @@ def snapshot(today):
         "- Price = median listed price on models.dev, 3 input tokens per output token, per token only. "
         + "Reasoning modes (High, Max) use more tokens, so real costs can be higher.",
         "- Each model appears once, with its best variant. "
-        + "A model released in the last days can be missing from LMArena for a while.",
+        + "A model released in the last days can be missing from LMArena for a while, "
+        + "and the LMArena website marks very new models as 'Preliminary' (few votes), a flag this data lacks.",
         "- Not covered: agentic coding, speed, latency, long-context accuracy, image and video generation prices.",
         "",
         "## Strongest models overall: Epoch Capabilities Index (ECI), top 15",

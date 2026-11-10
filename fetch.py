@@ -15,6 +15,7 @@ import json
 import sys
 import urllib.request
 import zipfile
+from collections import Counter
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
@@ -38,9 +39,10 @@ def get(url):
 
 
 def arena():
+    """LMArena scores, and the lab slug of every model (like 'zai' or 'meta')."""
     import pyarrow.parquet as pq  # only needed here, so tests can import this file without it
 
-    out = []
+    out, orgs = [], {}
     for f in json.loads(get(ARENA))["parquet_files"]:
         if f["split"] != "latest" or f["config"] not in ARENA_CONFIGS:
             continue
@@ -48,6 +50,7 @@ def arena():
         for cat in {r["category"] for r in rows}:
             top = sorted((r for r in rows if r["category"] == cat), key=lambda r: -r["rating"])[:TOP]
             for r in top:
+                orgs[key(r["model_name"])] = r["organization"]
                 lo, hi = r["rating_lower"], r["rating_upper"]
                 se = (hi - lo) / (2 * 1.96) if lo is not None and hi is not None else ""
                 out.append(
@@ -60,7 +63,7 @@ def arena():
                         "date": str(r["leaderboard_publish_date"])[:10],
                     }
                 )
-    return out
+    return out, orgs
 
 
 def epoch(z):
@@ -133,13 +136,21 @@ def prices():
     return out
 
 
-def models(price_rows, scores, meta):
-    """One row per model: price, open-weight flag and release date (models.dev), lab and availability (Epoch)."""
+def models(price_rows, scores, meta, orgs):
+    """One row per model: price, open-weight flag and release date (models.dev), lab and availability (Epoch).
+
+    A model Epoch does not know gets the lab LMArena gives it, written the way Epoch writes that lab.
+    """
     priced = {r["key"]: r for r in price_rows}
+    spelling = {}  # LMArena slug -> Epoch's name for the lab, from the models both sources know
+    for (slug, lab), _ in Counter((orgs[k], meta[k][0]) for k in orgs if k in meta and orgs[k]).most_common():
+        spelling.setdefault(slug, lab)
     out = []
     for k in priced.keys() | {key(r["model"]) for r in scores}:
         p = priced.get(k, {})
         lab, access = meta.get(k, ("", ""))
+        slug = orgs.get(k, "")
+        lab = lab or (spelling.get(slug) or slug.replace("-", " ").title())
         out.append(
             {
                 "key": k,
@@ -193,12 +204,13 @@ def check(scores, price_rows):
 
 if __name__ == "__main__":
     z = zipfile.ZipFile(io.BytesIO(get(EPOCH)))
-    scores = drop_stale(arena() + epoch(z))
+    arena_scores, orgs = arena()
+    scores = drop_stale(arena_scores + epoch(z))
     price_rows = prices()
     check(scores, price_rows)
     DATA.mkdir(exist_ok=True)
     write("scores.csv", SCORE_FIELDS, scores)
-    write("models.csv", MODEL_FIELDS, models(price_rows, scores, epoch_meta(z)))
+    write("models.csv", MODEL_FIELDS, models(price_rows, scores, epoch_meta(z), orgs))
     (DATA / "last_update.txt").write_text(date.today().isoformat() + "\n")
     (DATA / "SNAPSHOT.md").write_text(snapshot(date.today()), encoding="utf-8", newline="\n")
     print(f"OK: {len(scores)} scores, {len(price_rows)} priced models")

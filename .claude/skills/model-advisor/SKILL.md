@@ -56,6 +56,7 @@ installed outside the repository (a symlink or junction), resolve the link and g
 - A warning about a benchmark near its ceiling means the top models are hard to tell apart: say so,
   and prefer another benchmark when one fits.
 - A model marked `Unreleased` or `Limited access` may not be usable yet: tell the user.
+- A model from the "Newest models" table has few votes: its LMArena rank is less stable than its `+/-` suggests.
 - A new model can be missing from LMArena for days, and from ECI too. If the user asks about a model
   that is not in the data, say that, do not guess.
 - Not covered by the data: agentic coding, speed and latency, image and video generation prices,

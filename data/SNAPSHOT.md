@@ -6,7 +6,7 @@ How to read it:
 - LMArena scores are human preference (Elo). They do not measure correctness.
 - Epoch scores are correctness on benchmarks (%). ECI is Epoch's own index that combines many of them.
 - Price = median listed price on models.dev, 3 input tokens per output token, per token only. Reasoning modes (High, Max) use more tokens, so real costs can be higher.
-- Each model appears once, with its best variant. A model released in the last days can be missing from LMArena for a while.
+- Each model appears once, with its best variant. A model released in the last days can be missing from LMArena for a while, and the LMArena website marks very new models as 'Preliminary' (few votes), a flag this data lacks.
 - Not covered: agentic coding, speed, latency, long-context accuracy, image and video generation prices.
 
 ## Strongest models overall: Epoch Capabilities Index (ECI), top 15
@@ -34,19 +34,19 @@ How to read it:
 | Released | Model | Lab | Price $/M | On LMArena | In ECI | Note |
 |---|---|---|---|---|---|---|
 | 2026-11-10 | Gemini 4 Carbon (High) | Google DeepMind | 4.00 | yes | no | Epoch: Unreleased |
-| 2026-11-09 | Muse Ember (Max) | - | 0.20 | yes | no |  |
+| 2026-11-09 | Muse Ember (Max) | Meta AI | 0.20 | yes | no |  |
 | 2026-11-09 | Claude Fable 5.2 | Anthropic | 16.00 | no | yes |  |
 | 2026-10-26 | GPT-6.1 Terra | OpenAI | 2.00 | yes | yes |  |
 | 2026-10-23 | Kimi K3.1 Pro | Moonshot | 4.00 | yes | yes |  |
-| 2026-10-19 | MiniMax-M3.1-Flash | - | 0.26 | yes | no |  |
+| 2026-10-19 | MiniMax-M3.1-Flash | MiniMax | 0.26 | yes | no |  |
 | 2026-10-17 | DeepSeek V4.1 Flash 1017 | DeepSeek | 0.52 | no | yes |  |
-| 2026-10-15 | NVIDIA-Nemotron-3.5-Super-VL-120B-A12B (NVFP4) | - | 0.28 | yes | no |  |
+| 2026-10-15 | NVIDIA-Nemotron-3.5-Super-VL-120B-A12B (NVFP4) | Nvidia | 0.28 | yes | no |  |
 | 2026-10-15 | Muse Spark Open | Meta AI | 2.00 | yes | yes |  |
 | 2026-10-13 | Gemini 4 Argon | Google DeepMind | 4.00 | yes | yes | Epoch: Limited access |
 | 2026-10-12 | Muse Wonder | Meta AI | 8.00 | yes | yes |  |
 | 2026-10-07 | Claude Haiku 5.5 | Anthropic | 0.20 | yes | yes |  |
 | 2026-10-06 | Mistral Large 4 | Mistral AI | 1.05 | yes | yes |  |
-| 2026-10-05 | Beam 1.0 501B A23B | - | 0.47 | yes | no |  |
+| 2026-10-05 | Beam 1.0 501B A23B | Reflection | 0.47 | yes | no |  |
 | 2026-10-05 | Beam 1.0 | Reflection | 0.75 | no | yes |  |
 | 2026-09-29 | GPT-6.1 Sol | OpenAI | 4.00 | yes | yes |  |
 | 2026-09-28 | Claude Sonnet 5.5 | Anthropic | 4.00 | yes | yes |  |
@@ -197,7 +197,7 @@ Near the ceiling: the top models are hard to tell apart on this benchmark.
 | 2 | gemini-4-argon_high | 76.0% +/-2.6 | Google DeepMind | 4.00 | Epoch: Limited access |
 | 3 | gpt-6-astra_max | 75.6% +/-2.7 | OpenAI | 20.00 |  |
 | 4 | gpt-6.1-sol_max | 73.9% +/-2.7 | OpenAI | 4.00 |  |
-| 5 | gemini-3.1-pro-preview_high | 73.5% +/-2.7 | - | 4.50 |  |
+| 5 | gemini-3.1-pro-preview_high | 73.5% +/-2.7 | Google DeepMind | 4.50 |  |
 
 ## All benchmarks (ask `python recommend.py <name> --top 20` for any of them)
 

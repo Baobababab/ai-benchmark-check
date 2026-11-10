@@ -6,7 +6,7 @@ import unittest
 import zipfile
 from datetime import date
 
-from fetch import check, epoch, epoch_meta
+from fetch import check, epoch, epoch_meta, models
 from recommend import key, main, pick, snapshot
 
 PRICES = {  # key -> model row, as read from data/models.csv
@@ -110,6 +110,15 @@ class ParserTest(unittest.TestCase):
 
     def test_epoch_meta(self):
         self.assertEqual(epoch_meta(fake_epoch_zip())["bigmodel"], ("Some Lab", "Unreleased"))
+
+
+class ModelsTest(unittest.TestCase):
+    def test_lab_from_lmarena_written_like_epoch(self):
+        meta = {"known": ("Meta AI", "API access")}
+        orgs = {"known": "meta", "newone": "meta", "stranger": "some-lab", "nolab": ""}
+        scores = [{"model": n} for n in ("Known", "NewOne (Max)", "Stranger", "NoLab")]
+        labs = {r["key"]: r["lab"] for r in models([], scores, meta, orgs)}
+        self.assertEqual(labs, {"known": "Meta AI", "newone": "Meta AI", "stranger": "Some Lab", "nolab": ""})
 
 
 class CheckTest(unittest.TestCase):

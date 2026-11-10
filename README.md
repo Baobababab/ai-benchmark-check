@@ -100,7 +100,8 @@ Fifteen tests run offline. They check the name matching, the tie rule, the Epoch
 - **Tied is not equal.** New models have few votes and a wide uncertainty, so they can look tied with the best. The `+/-` shows how sure a score is. A benchmark where the best score is 95% or more is near its ceiling and the output says so.
 - **The tie test is simple.** It treats each score as independent and the intervals as symmetric. Scores of different models are measured on the same questions or battles, so a paired test could separate some pairs that this one calls tied.
 - **Only the top 100 models** of each LMArena benchmark are kept, so `--open` only sees open-weight models in that list.
-- **LMArena not compared with its website.** The data comes from LMArena's published Hugging Face dataset. The website blocks automated browsers, so I could not check the numbers against the leaderboard page. The Epoch figures were checked against Epoch's raw download, and the Anthropic prices against Anthropic's pricing page.
+- **New models rank less reliably.** The LMArena website marks some recently released models as "Preliminary" (few votes so far). The downloadable data does not carry that flag, so a model from the "Newest models" table in the snapshot can move up or down more than its `+/-` suggests.
+- **What I checked by hand (10 November 2026).** The 100 rows of the LMArena text leaderboard (score and `+/-`) against the arena.ai page: identical. The Epoch ranking against epoch.ai/eci and Epoch's raw download: identical. The Anthropic prices against Anthropic's pricing page: identical. I did not check every benchmark or every price.
 - It does not replace testing a model on your own task. No credentials are used or stored.
 
 ## AI-assisted development
