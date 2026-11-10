@@ -100,6 +100,11 @@ def pick(rows, models, open_only=False):
     return best, (priced[0] if priced else None), priced, unpriced
 
 
+def without_warning(priced):
+    """The cheapest tied model that Epoch does not mark as unreleased or limited access."""
+    return next((r for r in priced if r["access"] not in RISKY), None)
+
+
 def score_text(r, source, name):
     if source == "arena":
         text, scale, digits = f"{r['score']:.0f} Elo", 1, 0
@@ -285,7 +290,7 @@ def main(argv=None):
         for (src, name), b in found:
             print(f"{name}  [{src}, {len(b['keys'])} models, newest score {b['date']}]")
         if not found:
-            print("No benchmark matches.", file=sys.stderr)
+            print("No benchmark matches. Try a shorter word, or --list alone.", file=sys.stderr)
         return 0 if found else 1
     if args.model:
         return show_model(args.model, scores, models, benchmarks)
@@ -326,6 +331,8 @@ def main(argv=None):
         if best["price"] and rec is not best and best["price"] / max(rec["price"], 0.01) >= 1.5:
             extra = f"  <- {best['price'] / max(rec['price'], 0.01):.1f}x cheaper than the best"
         print(f"{'Recommended:':<18}{show(rec, source, name)}{extra}")
+    if rec and rec["access"] in RISKY and (usable := without_warning(priced)):
+        print(f"Cheapest tied model with no availability warning: {show(usable, source, name)}")
     same = [r for r in priced + unpriced if r["score"] == best["score"]]
     if len(same) > 1:
         print(f"Note: {len(same)} models share the top score, so 'Best' is the cheapest of them.")

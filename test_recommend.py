@@ -7,7 +7,7 @@ import zipfile
 from datetime import date
 
 from fetch import check, epoch, epoch_meta, models
-from recommend import Z, blended, key, label, load, main, pick, score_text, show, snapshot
+from recommend import Z, blended, key, label, load, main, pick, score_text, show, snapshot, without_warning
 
 PRICES = {  # key -> model row, as read from data/models.csv
     "bigmodel": {"input": "10", "output": "30", "open_weights": "False"},  # blended $15
@@ -113,6 +113,15 @@ def fake_epoch_zip():
 
 
 class ShowTest(unittest.TestCase):
+    def test_fallback_skips_models_with_an_availability_warning(self):
+        priced = [
+            {"model": "a", "access": "Unreleased"},
+            {"model": "b", "access": "API access"},
+            {"model": "c", "access": ""},
+        ]
+        self.assertEqual(without_warning(priced)["model"], "b")
+        self.assertIsNone(without_warning(priced[:1]))
+
     def test_scores_are_formatted_per_source(self):
         r = {"score": 0.964, "se": 0.0117, "source": "epoch", "model": "m", "name": ""}
         self.assertEqual(score_text(r, "epoch", "gpqa"), "96.4% +/-2.3")

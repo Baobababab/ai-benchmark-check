@@ -35,7 +35,7 @@ installed outside the repository (a symlink or junction), resolve the link and g
 |---|---|
 | Strongest model overall, "best model" | `eci` (Epoch Capabilities Index) |
 | General writing, chat, summaries | `text_style_control/overall` |
-| Writing in one language | `text_style_control/german`, `french`, `spanish`, `japanese`, `korean`, `chinese`, `russian`, `polish`; any other language: `text_style_control/non_english` |
+| Writing in one language | `text_style_control/german`, `french`, `spanish`, `japanese`, `korean`, `chinese`, `russian`, `polish`; any other language, Italian included: `text_style_control/non_english` (all non-English languages mixed: there is no Italian-only data, say so) |
 | Creative writing | `text_style_control/creative_writing` |
 | Code snippets, debugging | `text_style_control/coding` |
 | Web pages and UI | `webdev/webdev-react`, `webdev/webdev-html` |
@@ -44,22 +44,31 @@ installed outside the repository (a symlink or junction), resolve the link and g
 | Science questions (correctness) | `gpqa_diamond` |
 | Maths (correctness) | `frontiermath_tiers_1_3_v2` (hard), `text_style_control/math` (preference) |
 | Factual accuracy | `simpleqa_verified` |
+| Agentic coding | There is no SWE-bench data. `mirrorcode` (Epoch, software engineering and agent tasks) has few models and is near its ceiling. `text_style_control/coding` is a preference proxy, not the same thing: say so |
 | Reading images, OCR, charts | `vision_style_control/ocr`, `vision_style_control/diagram` |
 | Web search answers | `search/overall` |
 | Document questions | `document/overall` |
 | Law, medicine, finance, science, software | `text_style_control/industry_*` (run `--list industry`) |
 
+Other Epoch benchmarks, with the area Epoch gives them on epoch.ai/eci: `chess_puzzles` (games), `ebr_bench`
+(games, agent), `furniture_assembly` (multimodal, conceptual reasoning, agent), `mirrorcode` (software
+engineering, agent), `mystery_game_puzzles` (games), `spireclimb` (games, multimodal, agent),
+`frontiermath_tier_4_v2` and `frontiermath_tiers_1_3_v2` (mathematics, agent).
+
 ## Rules
 
 - LMArena measures what people prefer, not whether an answer is correct. Epoch benchmarks measure
   correctness, but only for science, maths, puzzles and similar tasks. ECI combines many of them.
+- "Tied" means the score gap is not larger than the square root of (±a² + ±b²), using the two `+/-` values.
+  Overlapping `+/-` ranges are not the test.
 - A warning about a benchmark near its ceiling means the top models are hard to tell apart: say so,
   and prefer another benchmark when one fits.
-- A model marked `Unreleased` or `Limited access` may not be usable yet: tell the user.
+- A model marked `Unreleased` or `Limited access` may not be usable yet: tell the user, and offer the
+  "cheapest tied model with no availability warning" line when the script prints it.
 - A model from the "Newest models" table has few votes: its LMArena rank is less stable than its `+/-` suggests.
 - A new model can be missing from LMArena for days, and from ECI too. If the user asks about a model
   that is not in the data, say that, do not guess.
-- Not covered by the data: agentic coding, speed and latency, image and video generation prices,
+- Not covered by the data: SWE-bench style agentic coding, speed and latency, image and video generation prices,
   long-context accuracy. Say "no openly licensed data for this" instead of guessing.
 - Prices are per token, a median over providers. Reasoning modes (High, Max) use more tokens, so the
   real bill can be higher. Models with no price in the output cannot be recommended.

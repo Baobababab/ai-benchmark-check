@@ -98,7 +98,7 @@ The tests run offline. They check the name matching, the price blend, the tie ru
 ## Limitations and safety
 
 - **Two kinds of quality.** LMArena measures preference, not correctness. Epoch measures correctness, but only on science, maths and puzzles. ECI is Epoch's own combination of its benchmarks.
-- **Not covered:** agentic coding (SWE-bench style), speed, image and video generation prices, long-context accuracy. I found no data for these that I may legally redistribute.
+- **Not covered:** agentic coding in the SWE-bench style (Epoch's `mirrorcode` is the only software-engineering agent benchmark here, with few models), speed, image and video generation prices, long-context accuracy. I found no data for these that I may legally redistribute.
 - **Prices are rough.** Per token only, the median across providers, assuming 3 input tokens per output token. Reasoning modes (High, Max) use more tokens, so real costs can be higher. Tiered prices (for example above 100,000 tokens), caching and batch discounts are ignored.
 - **New models.** A model can be missing from LMArena for days after its release, and the same model can appear under different names in different sources. Models without a matching price show as "price unknown" and are never recommended.
 - **Availability.** Epoch marks some models as `Unreleased` or `Limited access`. The output warns about them, but I do not check availability myself.
