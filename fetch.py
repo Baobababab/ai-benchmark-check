@@ -5,7 +5,7 @@
 Sources (licenses in DATA_LICENSES.md):
   LMArena     human preference scores      HuggingFace lmarena-ai/leaderboard-dataset
   Epoch AI    correctness benchmarks       epoch.ai/data/benchmark_data.zip (Epoch's own runs only)
-  models.dev  prices and model metadata    models.dev/api.json
+  models.dev  prices, open-weight flag     models.dev/api.json
 """
 import csv
 import io
@@ -80,11 +80,9 @@ def prices():
                 by_key.setdefault(key(model_id), []).append((provider, c["input"], c["output"], m))
     out = []
     for k, offers in by_key.items():
-        offers.sort(key=lambda o: o[1] + o[2])
-        provider, inp, outp, m = offers[len(offers) // 2]  # median offer: hosts of open models vary a lot
-        out.append(dict(key=k, model_id=m["id"], provider=provider, input=inp, output=outp,
-                        context=(m.get("limit") or {}).get("context", ""), open_weights=bool(m.get("open_weights")),
-                        release_date=m.get("release_date", "")))
+        offers.sort(key=lambda o: (o[1] + o[2], o[0]))  # equal prices: order by provider name, so every run picks the same offer
+        _, inp, outp, m = offers[len(offers) // 2]  # median offer: hosts of open models vary a lot
+        out.append(dict(key=k, input=inp, output=outp, open_weights=bool(m.get("open_weights"))))
     return out
 
 
@@ -99,7 +97,7 @@ def drop_stale(scores):
 
 def write(name, fields, rows):
     with open(DATA / name, "w", encoding="utf-8", newline="") as f:
-        w = csv.DictWriter(f, fields)
+        w = csv.DictWriter(f, fields, lineterminator="\n")  # same bytes on Windows and Linux
         w.writeheader()
         w.writerows(sorted(rows, key=lambda r: [str(r[k]) for k in fields[:3]]))
 
@@ -128,6 +126,6 @@ if __name__ == "__main__":
     check(scores, price_rows)
     DATA.mkdir(exist_ok=True)
     write("scores.csv", SCORE_FIELDS, scores)
-    write("prices.csv", ["key", "model_id", "provider", "input", "output", "context", "open_weights", "release_date"], price_rows)
+    write("prices.csv", ["key", "input", "output", "open_weights"], price_rows)
     (DATA / "last_update.txt").write_text(date.today().isoformat() + "\n")
     print(f"OK: {len(scores)} scores, {len(price_rows)} priced models")

@@ -20,7 +20,7 @@ derived from the three sources below and keep **their** licenses. Terms were rea
 - Citation: Epoch AI, 'Capabilities & benchmarking'. Published online at epoch.ai. Retrieved from 'https://epoch.ai/benchmarks' [online resource].
 - Changes made here: latest run per model, selected columns, benchmarks marked as superseded are skipped.
 
-## models.dev: prices and model metadata
+## models.dev: prices and open-weight flag
 
 - Source: [models.dev](https://models.dev) ([repository](https://github.com/anomalyco/models.dev)).
 - License: MIT. Notice required by the license:

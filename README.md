@@ -2,7 +2,7 @@
 
 Tells you which AI model to use for a task: the **cheapest model that is statistically as good as the best one**, based on open leaderboards and public prices.
 
-**Status:** small personal project. Tested on Python 3.12 on Windows.
+**Status:** small personal project. Tested on Python 3.12, on Windows and on Linux (GitHub Actions).
 
 ## Example
 
