@@ -18,8 +18,8 @@ installed outside the repository (a symlink or junction), resolve the link and g
    model of each lab, and the top 5 of the key benchmarks, with prices. Answer from it when it is enough.
 2. **Need more detail?**
    - `python recommend.py --list <word>` finds a benchmark by name.
-   - `python recommend.py --model <name>` shows one model: lab, price, release date and its rank in every
-     benchmark. Use it to look up or compare named models (run it once per model).
+   - `python recommend.py --model <name>` shows one model: lab, price, release date and its rank in the key
+     benchmarks. Use it to look up or compare named models (run it once per model).
    - `python recommend.py <benchmark> --top 20` ranks the models (add `--open` for open-weight only).
    - `python recommend.py <benchmark>` gives the cheapest model that is statistically tied with the best.
    Never invent a benchmark name, and do not read the CSV files by hand: the scripts remove duplicates.

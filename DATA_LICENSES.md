@@ -6,7 +6,7 @@ derived from the three sources below and keep **their** licenses. Terms were rea
 
 ## LMArena: human preference scores
 
-- Source: [lmarena-ai/leaderboard-dataset](https://huggingface.co/datasets/lmarena-ai/leaderboard-dataset) on Hugging Face, by LMArena (lmarena.ai).
+- Source: [lmarena-ai/leaderboard-dataset](https://huggingface.co/datasets/lmarena-ai/leaderboard-dataset) on Hugging Face, by LMArena (arena.ai).
 - License: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 - Changes made here: only the `latest` split, only the `text_style_control`, `vision_style_control`,
   `webdev`, `search` and `document` configs, the top 100 models per category, selected columns,

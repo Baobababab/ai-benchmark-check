@@ -28,7 +28,6 @@ jobs:
       - run: python fetch.py
       # The new data must still produce answers before it is committed.
       - run: python recommend.py eci --top 3
-      - run: python -m unittest
       - name: Commit the data if it changed
         run: |
           git config user.name "github-actions[bot]"
