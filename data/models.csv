@@ -20,7 +20,7 @@ aliclouddeepseekv4flash,0.14,0.28,True,2026-04-24,,,
 aliclouddeepseekv4pro,1.69,3.38,True,2026-04-24,,,
 alicloudglm51,0.84,3.38,True,2026-04-07,,,
 amazonnova2litev10,0.33,2.75,False,2025-12-02,,,
-amazonnovaexperimentalchat,,,,,Amazon,,amazon-nova-experimental-chat (26-01-10)
+amazonnovaexperimentalchat,,,,,Amazon,,amazon-nova-experimental-chat (26-02-10)
 amazonnovalite,0.3,2.5,False,2025-12-02,Amazon,API access,
 amazonnovalitev10,0.06,0.24,False,2024-12-03,,,
 amazonnovalitev10us,0.06,0.24,False,2024-12-03,,,
