@@ -1,0 +1,30 @@
+name: Update data
+
+on:
+  schedule:
+    - cron: "30 5 * * *"   # every day, 05:30 UTC
+  workflow_dispatch:       # manual run from the Actions tab
+
+permissions:
+  contents: write          # needed to commit the refreshed CSV files
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python -m unittest
+      # fetch.py exits with an error if a source is empty, stale or no longer matches prices.
+      # A red run means the data was NOT updated.
+      - run: python fetch.py
+      - name: Commit the data if it changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          git diff --cached --quiet || (git commit -m "Update data $(date -u +%F)" && git push)

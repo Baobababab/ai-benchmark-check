@@ -1,0 +1,87 @@
+# AI Benchmark Check
+
+Tells you which AI model to use for a task: the **cheapest model that is statistically as good as the best one**, based on open leaderboards and public prices.
+
+**Status:** small personal project. Tested on Python 3.12 on Windows.
+
+## Example
+
+"Which model should read my scanned invoices?" is a question about OCR, so:
+
+```text
+$ python recommend.py vision_style_control/ocr
+Benchmark: vision_style_control/ocr (arena), newest score 2026-11-09, data fetched 2026-11-10
+Best:             Claude Fable 5 (High)  1327 Elo +/-7  $20.00/M tokens
+Recommended:      Gemini 3.8 Flash (High)  1315 Elo +/-9  $1.50/M tokens  <- 13.3x cheaper than the best
+Tied = scores within 95% confidence of the best.
+Price = median listed price on models.dev, 3:1 input:output blend. Per token only: reasoning modes use more tokens.
+```
+
+This is a snapshot from 10 November 2026. The data changes every day.
+
+## Quickstart
+
+You need Python 3.9 or newer and Git. No API key, no account.
+
+```bash
+git clone https://github.com/Baobababab/ai-benchmark-check.git
+cd ai-benchmark-check
+python recommend.py --list              # what you can ask about
+python recommend.py gpqa_diamond        # recommend a model for science questions
+python recommend.py coding --open       # open-weight models only
+```
+
+`recommend.py` only reads the CSV files in `data/`, so nothing else needs installing.
+The benchmark name can be a part of the full name (`coding` finds `text_style_control/coding`).
+
+To refresh the data yourself (it also updates daily on GitHub):
+
+```bash
+python -m pip install -r requirements.txt
+python fetch.py
+```
+
+### Use it inside Claude Code
+
+Open this folder in Claude Code and ask, for example, "Which model should I use to summarise legal contracts?".
+The skill in [`.claude/skills/model-advisor`](.claude/skills/model-advisor/SKILL.md) tells Claude which benchmark to pick, runs the script and explains the result.
+
+## How it works
+
+- **Input:** three open data sources, downloaded by `fetch.py` into `data/`:
+  [LMArena](https://lmarena.ai) (which answers people prefer), [Epoch AI](https://epoch.ai/benchmarks) (which answers are correct: science, maths, puzzles) and [models.dev](https://models.dev) (prices).
+- **Processing:** for one benchmark, two models are *tied* when their score difference is smaller than the statistical noise (95% confidence, using the published uncertainty of each score). Among the models tied with the best, the cheapest wins. Prices are matched to scores by model name.
+- **Output:** the best model, the recommended one and the other tied options, with scores and prices.
+
+I chose this rule because I can explain it in one sentence and check it by hand.
+A GitHub Actions job runs `fetch.py` every day and commits the new data. If a source is empty, stale or its model names no longer match the price list, `fetch.py` stops with an error and the data is not updated.
+
+## Checks
+
+```bash
+python -m unittest
+```
+
+Five offline tests check the name matching and the tie rule. `fetch.py` has its own sanity checks (row counts, data age, price coverage) that run on every update.
+
+## Limitations and safety
+
+- **Two kinds of quality.** LMArena measures preference, not correctness. Epoch measures correctness, but only on science, maths and puzzles.
+- **Not covered:** agentic coding (SWE-bench style), speed, image and video generation prices, long-context accuracy. I found no data for these that I may legally redistribute.
+- **Prices are rough.** Per token only, the median across providers, assuming 3 input tokens per output token. Reasoning modes (High, Max) use more tokens, so real costs can be higher.
+- **Tied is not equal.** New models have few votes and a wide uncertainty, so they can look tied with the best. The `+/-` shows how sure a score is.
+- **Name matching is a heuristic.** Models without a matching price show as "price unknown" and are never recommended.
+- **Only the top 100 models** of each benchmark are kept.
+- It does not replace testing a model on your own task. No credentials are used or stored.
+
+## AI-assisted development
+
+I specified the tool, chose the data sources and decided which ones I may legally redistribute. The code was written with an AI coding agent (Claude Code). I reviewed the results and I am responsible for what is published here.
+
+## Sources and attribution
+
+Data: LMArena (CC BY 4.0), Epoch AI (CC BY 4.0), models.dev (MIT). Details, citations and the sources I did not use are in [DATA_LICENSES.md](DATA_LICENSES.md).
+
+## License
+
+Code: MIT, see [LICENSE](LICENSE). The data in `data/` keeps the licenses of its sources.
