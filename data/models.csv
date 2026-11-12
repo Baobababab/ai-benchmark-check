@@ -316,7 +316,7 @@ deepseekcoder33b,,,True,,DeepSeek,Open weights (restricted use),DeepSeek Coder 3
 deepseekcoder67b,,,True,,DeepSeek,Open weights (restricted use),DeepSeek Coder 6.7B
 deepseekcoderv2litebase,,,,,,,DeepSeek-Coder-V2-Lite-Base
 deepseekflash,0.15,0.6,True,2026-09-10,,,
-deepseekflashlatest,0.006,0.5,False,2026-09-14,,,
+deepseekflashlatest,0.022,0.4,False,2026-09-14,,,
 deepseeklatest,0.66,4.0139,True,2026-05-03,,,
 deepseekllm67bchat,,,,,,,
 deepseekocr,0.2,0.7,True,2025-10-20,,,
@@ -353,7 +353,9 @@ deepseekv32speciale,0.58,1.68,True,2025-12-01,DeepSeek,Open weights (unrestricte
 deepseekv32tee,1,1,True,2025-12-01,,,
 deepseekv32thinking,0.29,0.43,True,2025-12-01,,,
 deepseekv3v10,0.58,1.68,True,2025-08-21,,,
-deepseekv41flash,0.246708,1.233541,True,2026-09-10,DeepSeek,Open weights (unrestricted),DeepSeek V4.1 Flash
+deepseekv41flash,0.244794,1.22397,True,2026-09-10,DeepSeek,Open weights (unrestricted),DeepSeek V4.1 Flash
+deepseekv41flash0910uncensored,0.33,1.32,True,2026-10-27,,,
+deepseekv41flash0910uncensoredthinking,0.33,1.32,True,2026-10-27,,,
 deepseekv41flash1017,0.3,1.2,True,2026-10-17,DeepSeek,Open weights (unrestricted),DeepSeek V4.1 Flash 1017
 deepseekv41flash1017abliterated,0.3,1.2,False,2026-10-17,,,
 deepseekv41flash1017eu,0.5,1.5,True,2026-10-17,,,
@@ -373,11 +375,12 @@ deepseekv41flashflex,0.0975,0.39,True,2026-10-17,,,
 deepseekv41flashmarathon,0.14,0.28,True,2026-09-10,,,
 deepseekv41flashpeft262144,0.6,3.6,True,2026-09-10,,,
 deepseekv41flashthinking,0.022,0.4,True,2026-09-10,,,
-deepseekv41flashuncensored,0.18,0.65,False,2026-10-23,,,
+deepseekv41flashuncensored,0.33,1.32,True,2026-10-01,,,
+deepseekv41flashuncensoredthinking,0.33,1.32,True,2026-10-01,,,
 deepseekv4flash,0.14,0.28,True,2026-04-24,DeepSeek,Open weights (unrestricted),DeepSeek-V4-Flash
 deepseekv4flash0423,0.14,0.28,True,2026-04-23,,,
 deepseekv4flash0423thinking,0.14,0.28,True,2026-04-23,,,
-deepseekv4flash0731,0.25,0.3,True,2026-07-31,DeepSeek,Open weights (unrestricted),DeepSeek V4 Flash 0731
+deepseekv4flash0731,0.1596,0.399,True,2026-07-31,DeepSeek,Open weights (unrestricted),DeepSeek V4 Flash 0731
 deepseekv4flash0731eu,0.28,0.56,True,2026-07-31,,,
 deepseekv4flash0731fast,0.35,0.7,True,2026-07-31,,,
 deepseekv4flash0731tee,0.44,1.32,True,2026-07-31,,,
@@ -396,7 +399,7 @@ deepseekv4p1flash1017,0.3,1.2,True,2026-10-17,,,
 deepseekv4p1flash1017spot,0.21,0.84,True,2026-10-17,,,
 deepseekv4p1flash1017ultrafast,2.4,9.6,True,2026-10-17,,,
 deepseekv4p1flashspot,0.21,0.84,True,2026-09-10,,,
-deepseekv4pro,1.65,3.301,True,2026-04-24,DeepSeek,Open weights (unrestricted),DeepSeek-V4-Pro
+deepseekv4pro,1.65,3.3,True,2026-04-24,DeepSeek,Open weights (unrestricted),DeepSeek-V4-Pro
 deepseekv4pro0423,1.74,3.48,True,2026-04-23,,,
 deepseekv4pro0813,1.32,3.96,True,2026-08-13,DeepSeek,Open weights (unrestricted),DeepSeek V4 Pro 0813
 deepseekv4pro0813eu,1.75,3.5,True,2026-08-13,,,
@@ -530,7 +533,7 @@ gemini25flasheu,0.3,2.5,False,2025-06-17,,,
 gemini25flashimage,0.3,2.5,False,2025-08-26,,,
 gemini25flashlite,0.1,0.4,False,2025-06-17,,,Gemini 2.5 Flash-Lite (Jun 2025)
 gemini25flashliteeu,0.1,0.4,False,2025-06-17,,,
-gemini25flashlitepreview,,,,,Google DeepMind,,"Gemini 2.5 Flash-Lite Preview (Non-Thinking, 09-2025)"
+gemini25flashlitepreview,,,,,Google DeepMind,,"Gemini 2.5 Flash-Lite Preview (Thinking, 06-17)"
 gemini25flashlitepreview0617,0.15,0.6,False,2025-06-17,,,
 gemini25flashlitepreview092025,0.1,0.4,False,2025-09-25,,,
 gemini25flashlitepreview092025thinking,0.1,0.4,False,2025-09-25,,,
@@ -601,7 +604,7 @@ gemini4argon,2,10,False,2026-10-13,Google DeepMind,Limited access,Gemini 4 Argon
 gemini4argoncontributor,4,20,False,2026-10-13,,,
 gemini4argoneu,4,20,False,2026-10-13,,,
 gemini4argonus,4,20,False,2026-10-13,,,
-gemini4carbon,2,10,False,2026-11-10,Google DeepMind,Unreleased,Gemini 4 Carbon (High)
+gemini4carbon,2,10,False,2026-11-10,Google DeepMind,Unreleased,Gemini 4 Carbon
 gemini4carboneu,4,20,False,2026-11-10,,,
 gemini4carbonus,4,20,False,2026-11-10,,,
 geminideepresearch,1.6,9.6,False,2025-12-11,,,
@@ -645,7 +648,7 @@ gemma426ba4bitmoonlight,0.12,0.38,True,2026-07-29,,,
 gemma426ba4bitmusica,0.12,0.38,True,2026-07-29,,,
 gemma426ba4bitopusdistill,0.12,0.38,True,2026-07-29,,,
 gemma426ba4bitshadowsiren,0.12,0.38,True,2026-07-29,,,
-gemma426ba4bitthinking,0.011,0.034,True,2026-04-02,,,
+gemma426ba4bitthinking,0.01,0.031,True,2026-04-02,,,
 gemma426ba4bmeromero,0.12,0.38,True,2026-07-29,,,
 gemma426ba4bmeromerothinking,0.12,0.38,True,2026-07-29,,,
 gemma426ba4buncensored,0.15,0.7,True,2026-05-23,,,
@@ -719,7 +722,7 @@ glm47original,0.4004,1.9292,True,2025-12-22,,,
 glm47originalthinking,0.4004,1.9292,True,2025-12-22,,,
 glm47thinking,0.4004,1.9292,True,2025-12-22,,,
 glm5,1,3.2,True,2026-02-11,Z.ai (Zhipu AI),Open weights (unrestricted),GLM-5
-glm51,1.38,4.4,True,2026-04-07,Z.ai (Zhipu AI),Open weights (unrestricted),GLM-5.1
+glm51,1.4,4.4,True,2026-04-07,Z.ai (Zhipu AI),Open weights (unrestricted),GLM-5.1
 glm51eu,1.4,4.4,True,2026-04-07,,,
 glm51fp8,0.98,3.08,True,2026-04-07,,,
 glm51tee,0.9,2.9,True,2026-04-07,,,
@@ -979,7 +982,7 @@ granite401b,,,,,,,
 granite40350m,,,,,,,
 granite40hmicro,0.017,0.112,True,2025-10-02,,,
 granite40micro,,,,,,,
-granite428b,0.06,0.25,True,2026-08-25,,,
+granite428b,0.06,0.15,True,2026-08-25,,,
 granite4hsmall,0.0636,0.265,True,2025-10-02,,,
 graylineqwen38b,0.3,0.3,True,2025-09-25,,,
 greenl,0.285,0.912,True,2025-06-20,,,
@@ -1289,7 +1292,6 @@ mimov26proultraspeed,4.35,8.7,True,2026-09-21,,,
 mimov2flash,0.1,0.3,True,2025-12-16,Xiaomi Corp,Open weights (unrestricted),
 mimov2omni,,,,,Xiaomi Corp,,MiMo-V2-Omni
 mimov2pro,1,3,False,2026-03-18,Xiaomi Corp,API access,MiMo-V2-Pro
-minicpmv45,0.651,1.097,False,2026-06-02,,,
 minimax01,0.1394,1.122,False,2024-01-01,,,
 minimaxlatest,0.3,1.2,True,2026-05-03,,,
 minimaxm1,0.1394,1.3328,True,2025-01-08,,,
@@ -1383,7 +1385,7 @@ mistralministral38binstruct,0.15,0.15,True,2025-12-02,,,
 mistralmistrallarge3675binstruct,0.5,1.5,True,2025-12-02,,,
 mistralnemo,0.165,0.17,True,2024-07-18,Mistral AI,Open weights (unrestricted),Mistral NeMo
 mistralnemo12binstruct,0.038,0.1,True,2024-07-18,,,
-mistralnemoinstruct2407,0.1003,0.1207,True,2024-07-18,,,
+mistralnemoinstruct2407,0.0514,0.082,True,2024-07-18,,,
 mistralpixtrallarge2502v10,2,6,False,2025-04-08,,,
 mistralpixtrallarge2502v10us,2,6,False,2025-04-08,,,
 mistralsaba,0.2,0.6,False,2025-02-17,Mistral AI,API access,
@@ -1613,6 +1615,7 @@ palmyrax4,2.5,10,False,2024-10-09,,,
 palmyrax5,0.6,6,False,2025-04-28,,,
 pareto,2.645,7.935,False,2026-09-17,,,
 pareto2610,0.8,3.2,False,2026-10-01,,,
+pareto2610preview,0.8,3.2,False,2026-10-01,,,
 pareto269,2.5,7.5,False,2026-09-18,,,
 paretolatest,0.8,3.2,False,2026-10-13,,,
 particle1,0.125,0.5,False,2026-10-28,,,
@@ -1665,7 +1668,7 @@ qwen25vl32binstruct,0.2,0.6,True,2024-11-01,,,
 qwen25vl72binstruct,1.01,1.01,True,2025-01-26,,,
 qwen272b,,,True,,Alibaba,Open weights (unrestricted),Qwen2-72B
 qwen272binstruct,,,,,,,
-qwen314b,0.07,0.28,True,2024-01-01,Alibaba,Open weights (unrestricted),Qwen3-14B
+qwen314b,0.12,0.24,True,2024-01-01,Alibaba,Open weights (unrestricted),Qwen3-14B
 qwen317b,,,True,,Alibaba,Open weights (unrestricted),
 qwen3235b,0.22,0.88,True,2025-07-21,,,
 qwen3235ba22b,0.287,1.147,True,2025-04-28,Alibaba,Open weights (unrestricted),Qwen3-235B-A22B
@@ -1711,7 +1714,7 @@ qwen35397ba17btee,0.45,3,True,2026-02-15,,,
 qwen35397ba17bthinking,0.39,2.34,True,2026-02-15,,,
 qwen354b,0.04,0.07,True,2026-03-02,Alibaba,Open weights (restricted use),
 qwen354bpeft262144,0.33,1.005,True,2026-03-02,,,
-qwen359b,0.15,0.2,True,2026-02-23,Alibaba,Open weights (restricted use),Qwen3.5-9B
+qwen359b,0.111,0.167,True,2026-02-23,Alibaba,Open weights (restricted use),Qwen3.5-9B
 qwen359bbase,0.3,0.807,True,2026-02-26,,,
 qwen35flash,0.1,0.4,False,2026-02-23,Alibaba,,Qwen 3.5 Flash (hosted 35B-A3B)
 qwen35flash0223,0.065,0.26,False,2026-02-25,,,
@@ -1872,8 +1875,8 @@ sakananamazu,0.95,4,False,2026-08-03,,,
 sarvam105b,0.054,0.2124,True,2026-02-18,,,
 schematronv2small,0.05,0.23,False,2026-04-16,,,
 schematronv2turbo,0.03,0.15,False,2026-04-16,,,
-seed16,0.25,2,False,2025-10-15,,,
-seed16flash,0.075,0.3,False,2025-08-28,,,
+seed16,,,,,,,
+seed16flash,0.07935,0.3174,False,2025-08-28,,,
 seed18,0.25,2,False,2025-12-28,,,
 seed20code,0.5,3,False,2026-02-14,,,
 seed20codepreview260328,0.5,3,False,2026-03-28,,,
