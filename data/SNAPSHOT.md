@@ -1,6 +1,6 @@
 # Model data snapshot
 
-Written by `fetch.py` on 2026-11-14. Do not edit by hand. Newest LMArena score: 2026-11-11. Newest Epoch result: 2026-11-09.
+Written by `fetch.py` on 2026-11-15. Do not edit by hand. Newest LMArena score: 2026-11-11. Newest Epoch result: 2026-11-09.
 
 How to read it:
 - LMArena scores are human preference (Elo). They do not measure correctness.
@@ -50,7 +50,7 @@ How to read it:
 | 2026-10-12 | Muse Wonder | Meta AI | 8.00 | yes | yes |  |
 | 2026-10-07 | Claude Haiku 5.5 | Anthropic | 0.20 | yes | yes |  |
 | 2026-10-06 | Mistral Large 4 | Mistral AI | 1.05 | yes | yes |  |
-| 2026-10-05 | Beam 1.0 501B A23B | Reflection | 0.47 | yes | no |  |
+| 2026-10-05 | Beam 1.0 501B A23B | Reflection | 0.60 | yes | no |  |
 | 2026-10-05 | Beam 1.0 | Reflection | 0.75 | no | yes |  |
 | 2026-09-29 | GPT-6.1 Sol | OpenAI | 4.00 | yes | yes |  |
 | 2026-09-28 | Claude Sonnet 5.5 | Anthropic | 4.00 | yes | yes |  |
