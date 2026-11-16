@@ -1,6 +1,6 @@
 # Model data snapshot
 
-Written by `fetch.py` on 2026-11-15. Do not edit by hand. Newest LMArena score: 2026-11-11. Newest Epoch result: 2026-11-09.
+Written by `fetch.py` on 2026-11-16. Do not edit by hand. Newest LMArena score: 2026-11-15. Newest Epoch result: 2026-11-09.
 
 How to read it:
 - LMArena scores are human preference (Elo). They do not measure correctness.
@@ -35,6 +35,7 @@ How to read it:
 
 | Released | Model | Lab | Price $/M | On LMArena | In ECI | Note |
 |---|---|---|---|---|---|---|
+| 2026-11-16 | Qwen4-Max (xHigh) | Alibaba | 2.25 | yes | no |  |
 | 2026-11-12 | Gemini 4 Hydrogen (High) | Google DeepMind | 3.00 | yes | no |  |
 | 2026-11-10 | Gemini 4 Carbon | Google DeepMind | 4.00 | yes | yes |  |
 | 2026-11-09 | Muse Ember (Max) | Meta AI | 0.20 | yes | no |  |
@@ -54,7 +55,6 @@ How to read it:
 | 2026-10-05 | Beam 1.0 | Reflection | 0.75 | no | yes |  |
 | 2026-09-29 | GPT-6.1 Sol | OpenAI | 4.00 | yes | yes |  |
 | 2026-09-28 | Claude Sonnet 5.5 | Anthropic | 4.00 | yes | yes |  |
-| 2026-09-22 | MiMo-V2.6-Pro | Xiaomi Corp | 0.54 | yes | no |  |
 
 ## Best model of each lab (by ECI, top 12 labs)
 
@@ -119,11 +119,11 @@ How to read it:
 
 | # | Model | Score | Lab | Price $/M | Note |
 |---|---|---|---|---|---|
-| 1 | Claude Fable 5.2 (xHigh) | 1915 Elo +/-30 | Anthropic | 16.00 |  |
-| 2 | Claude Opus 5.5 (Max) | 1868 Elo +/-15 | Anthropic | 8.00 |  |
+| 1 | Claude Fable 5.2 (xHigh) | 1895 Elo +/-26 | Anthropic | 16.00 |  |
+| 2 | Claude Opus 5.5 (Max) | 1871 Elo +/-15 | Anthropic | 8.00 |  |
 | 3 | Claude Sonnet 5.5 (xHigh) | 1822 Elo +/-12 | Anthropic | 4.00 |  |
 | 4 | Gemini 4 Carbon (High) | 1792 Elo +/-18 | Google DeepMind | 4.00 |  |
-| 5 | Claude Fable 5.1 (Max) | 1787 Elo +/-10 | Anthropic | 20.00 |  |
+| 5 | Claude Fable 5.1 (Max) | 1788 Elo +/-10 | Anthropic | 20.00 |  |
 
 ### Reading images (human preference): `vision_style_control/ocr`
 
