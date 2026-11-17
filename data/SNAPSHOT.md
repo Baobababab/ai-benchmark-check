@@ -1,6 +1,6 @@
 # Model data snapshot
 
-Written by `fetch.py` on 2026-11-16. Do not edit by hand. Newest LMArena score: 2026-11-15. Newest Epoch result: 2026-11-09.
+Written by `fetch.py` on 2026-11-17. Do not edit by hand. Newest LMArena score: 2026-11-15. Newest Epoch result: 2026-11-09.
 
 How to read it:
 - LMArena scores are human preference (Elo). They do not measure correctness.
