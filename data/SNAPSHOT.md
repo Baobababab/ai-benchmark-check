@@ -1,6 +1,6 @@
 # Model data snapshot
 
-Written by `fetch.py` on 2026-11-20. Do not edit by hand. Newest LMArena score: 2026-11-19. Newest Epoch result: 2026-11-17.
+Written by `fetch.py` on 2026-11-21. Do not edit by hand. Newest LMArena score: 2026-11-20. Newest Epoch result: 2026-11-19.
 
 How to read it:
 - LMArena scores are human preference (Elo). They do not measure correctness.
@@ -13,25 +13,25 @@ How to read it:
 
 | # | Model | Score | Lab | Price $/M | Note |
 |---|---|---|---|---|---|
-| 1 | GPT-6.2 Astra | 174.2 ECI +/-4.1 | OpenAI | 16.00 |  |
-| 2 | Claude Fable 5.2 | 173.5 ECI +/-3.6 | Anthropic | 16.00 |  |
-| 3 | Gemini 4 Carbon | 169.8 ECI +/-3.4 | Google DeepMind | 4.00 |  |
-| 4 | GPT-6 Astra | 169.2 ECI +/-3.1 | OpenAI | 20.00 |  |
+| 1 | Claude Fable 5.2 | 173.4 ECI +/-3.6 | Anthropic | 16.00 |  |
+| 2 | GPT-6.2 Astra | 172.8 ECI +/-3.8 | OpenAI | 16.00 |  |
+| 3 | Gemini 4 Carbon | 169.7 ECI +/-3.3 | Google DeepMind | 4.00 |  |
+| 4 | GPT-6 Astra | 169.2 ECI +/-3.0 | OpenAI | 20.00 |  |
 | 5 | Claude Opus 5.5 | 168.7 ECI +/-3.0 | Anthropic | 8.00 |  |
 | 6 | GPT-6.1 Sol | 168.6 ECI +/-3.1 | OpenAI | 4.00 |  |
 | 7 | GPT-6.1 Terra | 167.7 ECI +/-3.1 | OpenAI | 2.00 |  |
-| 8 | Claude Fable 5.1 | 167.1 ECI +/-2.8 | Anthropic | 20.00 |  |
-| 9 | Claude Sonnet 5.5 | 166.6 ECI +/-2.9 | Anthropic | 4.00 |  |
-| 10 | Gemini 4 Argon | 166.6 ECI +/-2.8 | Google DeepMind | 4.00 |  |
-| 11 | Claude Opus 5 | 164.7 ECI +/-2.7 | Anthropic | 10.00 |  |
-| 12 | Claude Fable 5 | 164.2 ECI +/-2.5 | Anthropic | 20.00 |  |
-| 13 | GPT-6 Sol | 163.8 ECI +/-2.6 | OpenAI | 4.00 |  |
-| 14 | GPT-5.6 Sol | 163.1 ECI +/-2.4 | OpenAI | 8.00 |  |
-| 15 | GPT-5.5 Pro | 162.8 ECI +/-2.8 | OpenAI | 67.50 |  |
+| 8 | Claude Fable 5.1 | 167.1 ECI +/-2.9 | Anthropic | 20.00 |  |
+| 9 | Gemini 4 Hydrogen | 166.8 ECI +/-3.1 | Google DeepMind | 3.00 |  |
+| 10 | Claude Sonnet 5.5 | 166.6 ECI +/-2.8 | Anthropic | 4.00 |  |
+| 11 | Gemini 4 Argon | 166.5 ECI +/-2.8 | Google DeepMind | 4.00 |  |
+| 12 | Claude Opus 5 | 164.7 ECI +/-2.6 | Anthropic | 10.00 |  |
+| 13 | Claude Fable 5 | 164.2 ECI +/-2.5 | Anthropic | 20.00 |  |
+| 14 | GPT-6 Sol | 163.8 ECI +/-2.6 | OpenAI | 4.00 |  |
+| 15 | GPT-5.6 Sol | 163.0 ECI +/-2.4 | OpenAI | 8.00 |  |
 
 ## Newest models (released in the last 60 days, date from models.dev)
 
-30 models qualify, the 20 newest are shown.
+29 models qualify, the 20 newest are shown.
 
 | Released | Model | Lab | Price $/M | On LMArena | In ECI | Note |
 |---|---|---|---|---|---|---|
@@ -39,7 +39,7 @@ How to read it:
 | 2026-11-17 | GPT-6.2 Sol (Max) | OpenAI | 4.00 | yes | no |  |
 | 2026-11-17 | GPT-6.2 Astra | OpenAI | 16.00 | yes | yes |  |
 | 2026-11-16 | Qwen4-Max (xHigh) | Alibaba | 2.25 | yes | no |  |
-| 2026-11-12 | Gemini 4 Hydrogen (High) | Google DeepMind | 3.00 | yes | no |  |
+| 2026-11-12 | Gemini 4 Hydrogen | Google DeepMind | 3.00 | yes | yes |  |
 | 2026-11-10 | Gemini 4 Carbon | Google DeepMind | 4.00 | yes | yes |  |
 | 2026-11-09 | Muse Ember (Max) | Meta AI | 0.20 | yes | no |  |
 | 2026-11-09 | Claude Fable 5.2 | Anthropic | 16.00 | yes | yes |  |
@@ -48,7 +48,7 @@ How to read it:
 | 2026-10-26 | GPT-6.1 Terra | OpenAI | 2.00 | yes | yes |  |
 | 2026-10-23 | Kimi K3.1 Pro | Moonshot | 4.00 | yes | yes |  |
 | 2026-10-19 | MiniMax-M3.1-Flash | MiniMax | 0.26 | yes | no |  |
-| 2026-10-17 | DeepSeek V4.1 Flash 1017 | DeepSeek | 0.52 | no | yes |  |
+| 2026-10-17 | DeepSeek V4.1 Flash 1017 | DeepSeek | 0.49 | no | yes |  |
 | 2026-10-15 | NVIDIA-Nemotron-3.5-Super-VL-120B-A12B (NVFP4) | Nvidia | 0.28 | yes | no |  |
 | 2026-10-15 | Muse Spark Open | Meta AI | 2.00 | yes | yes |  |
 | 2026-10-13 | Gemini 4 Argon | Google DeepMind | 4.00 | yes | yes |  |
@@ -60,17 +60,17 @@ How to read it:
 
 | Lab | Model | ECI | Price $/M |
 |---|---|---|---|
-| OpenAI | GPT-6.2 Astra | 174.2 ECI +/-4.1 | 16.00 |
-| Anthropic | Claude Fable 5.2 | 173.5 ECI +/-3.6 | 16.00 |
-| Google DeepMind | Gemini 4 Carbon | 169.8 ECI +/-3.4 | 4.00 |
+| Anthropic | Claude Fable 5.2 | 173.4 ECI +/-3.6 | 16.00 |
+| OpenAI | GPT-6.2 Astra | 172.8 ECI +/-3.8 | 16.00 |
+| Google DeepMind | Gemini 4 Carbon | 169.7 ECI +/-3.3 | 4.00 |
 | Meta AI | Muse Wonder | 161.7 ECI +/-2.5 | 8.00 |
-| Moonshot | Kimi K3.1 Pro | 161.4 ECI +/-2.5 | 4.00 |
-| DeepSeek | DeepSeek V4.1 Flash 1017 | 159.4 ECI +/-2.4 | 0.52 |
-| xAI | Grok 4.6 | 157.8 ECI +/-2.1 | 3.00 |
+| Moonshot | Kimi K3.1 Pro | 161.2 ECI +/-2.4 | 4.00 |
+| DeepSeek | DeepSeek V4.1 Flash 1017 | 159.4 ECI +/-2.4 | 0.49 |
+| xAI | Grok 4.6 | 157.8 ECI +/-2.0 | 3.00 |
 | Alibaba | Qwen 3.8 Max | 157.6 ECI +/-2.2 | 3.00 |
-| Z.ai (Zhipu AI) | GLM-5.3 | 157.1 ECI +/-2.1 | 2.15 |
+| Z.ai (Zhipu AI) | GLM-5.3 | 157.1 ECI +/-2.2 | 2.15 |
 | Mistral AI | Mistral Large 4 | 154.6 ECI +/-2.8 | 1.05 |
-| Reflection | Beam 1.0 | 150.9 ECI +/-2.2 | 0.75 |
+| Reflection | Beam 1.0 | 150.8 ECI +/-2.3 | 0.75 |
 | Thinking Machines | Inkling-Small | 150.8 ECI +/-1.8 | 0.68 |
 
 ## Key benchmarks, top 5 each
@@ -119,11 +119,11 @@ How to read it:
 
 | # | Model | Score | Lab | Price $/M | Note |
 |---|---|---|---|---|---|
-| 1 | Claude Fable 5.2 (xHigh) | 1886 Elo +/-22 | Anthropic | 16.00 |  |
+| 1 | Claude Fable 5.2 (xHigh) | 1885 Elo +/-21 | Anthropic | 16.00 |  |
 | 2 | Claude Opus 5.5 (Max) | 1871 Elo +/-14 | Anthropic | 8.00 |  |
-| 3 | Claude Sonnet 5.5 (xHigh) | 1819 Elo +/-12 | Anthropic | 4.00 |  |
+| 3 | Claude Sonnet 5.5 (xHigh) | 1819 Elo +/-11 | Anthropic | 4.00 |  |
 | 4 | Gemini 4 Carbon (High) | 1793 Elo +/-18 | Google DeepMind | 4.00 |  |
-| 5 | Gemini 4 Neon (High) | 1787 Elo +/-17 | Google DeepMind | 6.00 |  |
+| 5 | Claude Fable 5.1 (Max) | 1787 Elo +/-9 | Anthropic | 20.00 |  |
 
 ### Reading images (human preference): `vision_style_control/ocr`
 
@@ -162,10 +162,10 @@ Near the ceiling: the top models are hard to tell apart on this benchmark.
 | # | Model | Score | Lab | Price $/M | Note |
 |---|---|---|---|---|---|
 | 1 | GPT-6.2 Astra (max) | 96.8% +/-2.4 | OpenAI | 16.00 |  |
-| 2 | Gemini 4 Hydrogen (High) (xhigh) | 96.8% +/-2.3 | Google DeepMind | 3.00 |  |
+| 2 | Gemini 4 Hydrogen (xhigh) | 96.8% +/-2.3 | Google DeepMind | 3.00 |  |
 | 3 | Gemini 4 Carbon (high) | 96.5% +/-2.4 | Google DeepMind | 4.00 |  |
 | 4 | Gemini 4 Argon (high) | 96.4% +/-2.3 | Google DeepMind | 4.00 |  |
-| 5 | claude-fable-5-2-fallback_max | 96.0% +/-2.6 | - | n/a |  |
+| 5 | Gemini 4 Neon (High) (xhigh) | 96.3% +/-2.5 | Google DeepMind | 6.00 |  |
 
 ### Maths (correctness): `frontiermath_tiers_1_3_v2`
 
